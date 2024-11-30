@@ -19,11 +19,11 @@ output "ecs_cluster_id" {
 }
 
 output "alb_dns_name" {
-  value = module.load_balancer.alb_dns_name
+  value = module.lb.alb_dns_name
 }
 
 output "alb_arn" {
-  value = module.load_balancer.alb_arn
+  value = module.lb.alb_arn
 }
 
 # Add other outputs as needed

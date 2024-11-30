@@ -10,6 +10,7 @@ variable "subnet_ids" {
 
 variable "db_username" {
   description = "The username for the RDS instance"
+  default = "postgres"
   type        = string
 }
 

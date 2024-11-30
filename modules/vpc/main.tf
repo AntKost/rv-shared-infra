@@ -10,11 +10,11 @@ resource "aws_vpc" "this" {
 resource "aws_subnet" "public" {
   count                   = 2
   vpc_id                  = aws_vpc.this.id
-  cidr_block              = cidrsubnet(aws_vpc.this.cidr_block, 8, count.index)
+  cidr_block              = cidrsubnet(aws_vpc.this.cidr_block, 4, count.index)
   availability_zone       = data.aws_availability_zones.available.names[count.index]
   map_public_ip_on_launch = true
   tags = {
-    Name = "road-vision-public-subnet-${count.index + 1}"
+    Name = "road-vision-subnet-public${count.index + 1}-${data.aws_availability_zones.available.names[count.index]}"
   }
 }
 
@@ -22,11 +22,11 @@ resource "aws_subnet" "public" {
 resource "aws_subnet" "private" {
   count                   = 2
   vpc_id                  = aws_vpc.this.id
-  cidr_block              = cidrsubnet(aws_vpc.this.cidr_block, 8, count.index + 2)
+  cidr_block              = cidrsubnet(aws_vpc.this.cidr_block, 4, 2 + count.index)
   availability_zone       = data.aws_availability_zones.available.names[count.index]
   map_public_ip_on_launch = false
   tags = {
-    Name = "road-vision-private-subnet-${count.index + 1}"
+    Name = "road-vision-subnet-private${count.index + 1}-${data.aws_availability_zones.available.names[count.index]}"
   }
 }
 
@@ -42,7 +42,7 @@ resource "aws_internet_gateway" "this" {
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.this.id
   tags = {
-    Name = "road-vision-public-rt"
+    Name = "road-vision-rtb-public"
   }
 }
 

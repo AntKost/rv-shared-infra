@@ -6,7 +6,7 @@ variable "aws_region" {
 
 variable "db_username" {
   type = string
-  default = "value"
+  default = "postgres"
 }
 
 variable "db_password" {
