@@ -18,6 +18,10 @@ output "ecs_cluster_id" {
   value = module.ecs_cluster.ecs_cluster_id
 }
 
+output "ecs_cluster_name" {
+  value = module.ecs_cluster.ecs_cluster_name
+}
+
 output "alb_dns_name" {
   value = module.lb.alb_dns_name
 }

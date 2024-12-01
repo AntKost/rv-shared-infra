@@ -15,4 +15,16 @@ variable "db_password" {
   sensitive   = true
 }
 
+variable "key_pair_name" {
+  description = "Name of the EC2 Key Pair for SSH access"
+  type        = string
+  default     = "" # Optional: Provide if SSH access is needed
+}
+
+variable "allowed_ports" {
+  description = "Ports to allow ingress from ALB on"
+  type = list(number)
+  default     = [1883]
+}
+
 # Add any other global variables if needed
