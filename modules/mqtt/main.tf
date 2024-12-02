@@ -16,34 +16,6 @@ resource "aws_service_discovery_service" "mqtt" {
   }
 }
 
-# Security Group for MQTT Service
-resource "aws_security_group" "mqtt_sg" {
-  name        = "mqtt-sg"
-  description = "Allow MQTT traffic"
-  vpc_id      = var.vpc_id
-
-  # Ingress rules - allow inbound MQTT traffic from ECS instances
-  ingress {
-    from_port       = 1883
-    to_port         = 1883
-    protocol        = "tcp"
-    security_groups = [var.ecs_instance_security_group_id]
-    description     = "Allow MQTT traffic from ECS instances"
-  }
-
-  # Egress rules - allow all outbound traffic
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "mqtt-sg"
-  }
-}
-
 # MQTT Task Definition
 resource "aws_ecs_task_definition" "mqtt" {
   family                   = "mqtt"
@@ -75,7 +47,7 @@ resource "aws_ecs_service" "mqtt" {
 
   network_configuration {
     subnets         = var.public_subnet_ids
-    security_groups = [aws_security_group.mqtt_sg.id]
+    security_groups = [var.mqtt_sg, var.ecs_instances_sg_id]
     assign_public_ip = true
   }
 

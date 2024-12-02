@@ -15,6 +15,11 @@ variable "db_password" {
   sensitive   = true
 }
 
+variable "cluster_name" {
+  type = string
+  default     = "road-vision-cluster"
+}
+
 variable "key_pair_name" {
   description = "Name of the EC2 Key Pair for SSH access"
   type        = string

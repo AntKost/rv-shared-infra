@@ -16,62 +16,6 @@ locals {
   ami_id = var.ecs_ami_id != "" ? var.ecs_ami_id : data.aws_ami.ecs_ami[0].id
 }
 
-# Security Group for ECS instances
-resource "aws_security_group" "ecs_instances_sg" {
-  name        = "${var.cluster_name}-instances-sg"
-  description = "Security group for ECS instances"
-  vpc_id      = var.vpc_id
-
-  # Ingress rules - restrict inbound traffic
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["176.100.25.70/32"] # Replace with your IP or trusted CIDR blocks
-    description = "Allow SSH access"
-  }
-
-  ingress {
-    from_port = 5432
-    to_port = 5432
-    protocol = "tcp"
-    security_groups = [var.db_security_group_id]
-    description = "Allow RDS access"
-  }
-
-  ingress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
-    self = true
-    description = "Allow self access"
-  }
-
-  dynamic "ingress" {
-    for_each = var.allowed_ports
-    content {
-      from_port                = ingress.value
-      to_port                  = ingress.value
-      protocol                 = "tcp"
-      security_groups          = [var.alb_security_group_id]
-      description              = "Allow traffic from ALB on port ${ingress.value}"
-      self                     = false
-    }
-  }
-
-  # Egress rules - allow outbound internet access
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "${var.cluster_name}-instances-sg"
-  }
-}
-
 # IAM Role for ECS Instances
 resource "aws_iam_role" "ecs_instance_role" {
   name = "${var.cluster_name}-ecs-instance-role"
@@ -130,7 +74,7 @@ resource "aws_launch_template" "ecs_launch_template" {
   }
 
   network_interfaces {
-    security_groups             = [aws_security_group.ecs_instances_sg.id]
+    security_groups             = [var.ecs_instances_sg_id]
     associate_public_ip_address = true
   }
 

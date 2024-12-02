@@ -1,7 +1,6 @@
 variable "cluster_name" {
   description = "The name of the ECS cluster"
   type        = string
-  default     = "road-vision-cluster"
 }
 
 variable "vpc_id" {
@@ -50,12 +49,17 @@ variable "key_pair_name" {
   default     = "" # Optional: Provide if you need SSH access
 }
 
-variable "alb_security_group_id" {
+variable "alb_sg_id" {
   description = "The Security Group ID attached to the ALB"
   type        = string
 }
 
-variable "db_security_group_id" {
+variable "ecs_instances_sg_id" {
+  description = "The Security Group ID attached to the ECS instances"
+  type        = string
+}
+
+variable "rds_sg_id" {
   description = "The Security Group ID attached to the RDS"
   type        = string
 }

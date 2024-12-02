@@ -23,7 +23,12 @@ variable "vpc_id" {
   type        = string
 }
 
-variable "ecs_instance_security_group_id" {
+variable "ecs_instances_sg_id" {
   description = "The Security Group ID attached to ECS instances"
+  type        = string
+}
+
+variable "mqtt_sg" {
+  description = "The Security Group ID attached to MQTT service"
   type        = string
 }

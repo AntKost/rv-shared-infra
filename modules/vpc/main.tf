@@ -62,7 +62,3 @@ resource "aws_route_table_association" "public" {
 
 # Data Source for Availability Zones
 data "aws_availability_zones" "available" {}
-
-# You can add NAT Gateway or NAT Instance here if needed
-
-# Security Groups (if any general ones are needed)

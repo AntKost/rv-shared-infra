@@ -9,28 +9,6 @@ resource "aws_db_subnet_group" "this" {
   }
 }
 
-# RDS Security Group
-resource "aws_security_group" "rds_sg" {
-  name        = "postgresql-sg"
-  description = "Allow database access"
-  vpc_id      = var.vpc_id
-
-  ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    self        = false
-    cidr_blocks = ["176.100.25.70/32"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
 # RDS Instance
 resource "aws_db_instance" "postgresql" {
   identifier              = "postgresql"
@@ -43,7 +21,7 @@ resource "aws_db_instance" "postgresql" {
   password                = var.db_password
   publicly_accessible     = true
   db_subnet_group_name    = aws_db_subnet_group.this.name
-  vpc_security_group_ids  = [aws_security_group.rds_sg.id]
+  vpc_security_group_ids  = [var.rds_sg_id]
   skip_final_snapshot     = true
   deletion_protection     = false
   multi_az                = false

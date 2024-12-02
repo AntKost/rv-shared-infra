@@ -1,0 +1,177 @@
+# Security Group for ECS instances
+resource "aws_security_group" "ecs_instances_sg" {
+  name        = "${var.cluster_name}-instances-sg"
+  description = "Security group for ECS instances"
+  vpc_id      = var.vpc_id
+
+  # Ingress rules - restrict inbound traffic
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["176.100.25.70/32"] # Replace with your IP or trusted CIDR blocks
+    description = "Allow SSH access"
+  }
+
+  ingress {
+    from_port = 5432
+    to_port = 5432
+    protocol = "tcp"
+    security_groups = [aws_security_group.rds_sg.id]
+    description = "Allow RDS access"
+  }
+
+  ingress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    self = true
+    description = "Allow self access"
+  }
+
+  dynamic "ingress" {
+    for_each = var.allowed_ports
+    content {
+      from_port                = ingress.value
+      to_port                  = ingress.value
+      protocol                 = "tcp"
+      security_groups          = [aws_security_group.alb_sg.id]
+      description              = "Allow traffic from ALB on port ${ingress.value}"
+      self                     = false
+    }
+  }
+
+  # Egress rules - allow outbound internet access
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.cluster_name}-instances-sg"
+  }
+}
+
+# Security Group for ALB
+resource "aws_security_group" "alb_sg" {
+  name        = "alb-sg"
+  description = "Allow HTTP and HTTPS traffic"
+  vpc_id      = var.vpc_id
+
+  # Ingress rules - allow HTTP and HTTPS
+  ingress {
+    from_port   = 8001
+    to_port     = 8001
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 1883
+    to_port     = 1883
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Egress rules - allow all outbound traffic
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "alb-sg"
+  }
+}
+
+# Security Group for MQTT Service
+resource "aws_security_group" "mqtt_sg" {
+  name        = "mqtt-sg"
+  description = "Allow MQTT traffic"
+  vpc_id      = var.vpc_id
+
+  # Ingress rules - allow inbound MQTT traffic from ECS instances
+  ingress {
+    from_port       = 1883
+    to_port         = 1883
+    protocol        = "tcp"
+    security_groups = [aws_security_group.ecs_instances_sg.id]
+    description     = "Allow MQTT traffic from ECS instances"
+  }
+
+  # Egress rules - allow all outbound traffic
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "mqtt-sg"
+  }
+}
+
+# RDS Security Group
+resource "aws_security_group" "rds_sg" {
+  name        = "postgresql-sg"
+  description = "Allow database access"
+  vpc_id      = var.vpc_id
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "external_access" {
+  security_group_id = aws_security_group.rds_sg.id
+
+  from_port   = 5432
+  to_port     = 5432
+  ip_protocol = "tcp"
+  cidr_ipv4   = "176.100.25.70/32"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ecs_access" {
+  security_group_id = aws_security_group.rds_sg.id
+
+  from_port   = 5432
+  to_port     = 5432
+  ip_protocol = "tcp"
+  referenced_security_group_id = aws_security_group.ecs_instances_sg.id
+}
+
+# Security Group for Redis Service
+resource "aws_security_group" "redis_sg" {
+  name        = "redis-sg"
+  description = "Allow Redis traffic"
+  vpc_id      = var.vpc_id
+
+  # Ingress rules - allow inbound Redis traffic from ECS instances
+  ingress {
+    from_port       = 6379
+    to_port         = 6379
+    protocol        = "tcp"
+    security_groups = [aws_security_group.ecs_instances_sg.id]
+    description     = "Allow Redis traffic from ECS instances"
+  }
+
+  # Egress rules - allow all outbound traffic
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "redis-sg"
+  }
+}
