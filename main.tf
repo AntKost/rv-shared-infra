@@ -9,6 +9,7 @@ module "security_groups" {
   cluster_name = var.cluster_name
   vpc_id = module.vpc.vpc_id
   allowed_ports = var.allowed_ports
+  my_ip = var.my_ip
 }
 
 module "rds" {
