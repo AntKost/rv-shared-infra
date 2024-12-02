@@ -23,6 +23,7 @@ module "ecs_cluster" {
   max_size          = 4
   key_pair_name     = var.key_pair_name
   alb_security_group_id      = module.lb.alb_security_group_id
+  db_security_group_id = module.rds.db_security_group_id
   allowed_ports              = var.allowed_ports
 }
 
