@@ -14,6 +14,10 @@ output "rds_endpoint" {
   value = module.rds.db_endpoint
 }
 
+output "db_security_group_id" {
+  value = module.rds.db_security_group_id
+}
+
 output "ecs_cluster_id" {
   value = module.ecs_cluster.ecs_cluster_id
 }
@@ -30,4 +34,30 @@ output "alb_arn" {
   value = module.lb.alb_arn
 }
 
-# Add other outputs as needed
+output "service_discovery_namespace_id" {
+  value = module.ecs_cluster.service_discovery_namespace_id
+}
+
+output "ecs_instance_security_group_id" {
+  value = module.ecs_cluster.ecs_instance_security_group_id
+}
+
+output "ecs_task_execution_role_arn" {
+  value = module.ecs_cluster.ecs_task_execution_role_arn
+}
+
+output "alb_security_group_id" {
+  value = module.lb.alb_security_group_id
+}
+
+output "mqtt_service_discovery_name" {
+  value = module.mqtt.mqtt_service_discovery_name
+}
+
+output "mqtt_sg_id" {
+  value = module.mqtt.mqtt_sg_id
+}
+
+output "redis_service_discovery_arn" {
+  value = module.redis.redis_service_discovery_arn
+}

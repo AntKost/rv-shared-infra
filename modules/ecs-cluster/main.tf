@@ -31,6 +31,22 @@ resource "aws_security_group" "ecs_instances_sg" {
     description = "Allow SSH access"
   }
 
+  ingress {
+    from_port = 5432
+    to_port = 5432
+    protocol = "tcp"
+    security_groups = [var.db_security_group_id]
+    description = "Allow RDS access"
+  }
+
+  ingress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    security_groups = [aws_security_group.ecs_instances_sg.id]
+    description = "Allow self access"
+  }
+
   dynamic "ingress" {
     for_each = var.allowed_ports
     content {

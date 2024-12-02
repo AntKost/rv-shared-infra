@@ -24,7 +24,7 @@ variable "key_pair_name" {
 variable "allowed_ports" {
   description = "Ports to allow ingress from ALB on"
   type = list(number)
-  default     = [1883]
+  default     = [22, 1883, 8000, 8001]
 }
 
 # Add any other global variables if needed

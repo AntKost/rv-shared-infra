@@ -55,6 +55,11 @@ variable "alb_security_group_id" {
   type        = string
 }
 
+variable "db_security_group_id" {
+  description = "The Security Group ID attached to the RDS"
+  type        = string
+}
+
 variable "allowed_ports" {
   description = "Ports to allow ingress from ALB on"
   type = list(number)
