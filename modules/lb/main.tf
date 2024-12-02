@@ -10,18 +10,75 @@ resource "aws_lb" "this" {
   }
 }
 
-# ALB Listener for HTTP
-resource "aws_lb_listener" "http" {
+resource "aws_lb_target_group" "mqtt_tg" {
+  name        = "mqtt-tg"
+  port        = 1883
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "ip"
+
+  health_check {
+    path                = "/"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    matcher             = "200-299"
+  }
+
+  tags = {
+    Name = "mqtt-tg"
+  }
+}
+
+resource "aws_lb_target_group" "redis_tg" {
+  name        = "redis-tg"
+  port        = 6379
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "ip"
+
+  health_check {
+    path                = "/"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    matcher             = "200-299"
+  }
+
+  tags = {
+    Name = "redis-tg"
+  }
+}
+
+resource "aws_lb_listener" "mqtt" {
   load_balancer_arn = aws_lb.this.arn
-  port              = "80"
+  port              = 1883
   protocol          = "HTTP"
 
   default_action {
-    type = "fixed-response"
-    fixed_response {
-      content_type = "text/plain"
-      message_body = "Default backend"
-      status_code  = "404"
-    }
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.mqtt_tg.arn
+  }
+
+  tags = {
+    Name = "mqtt-listener"
+  }
+}
+
+
+resource "aws_lb_listener" "redis" {
+  load_balancer_arn = aws_lb.this.arn
+  port              = 6379
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.redis_tg.arn
+  }
+
+  tags = {
+    Name = "redis-listener"
   }
 }

@@ -32,3 +32,7 @@ variable "mqtt_sg" {
   description = "The Security Group ID attached to MQTT service"
   type        = string
 }
+
+variable "mqtt_tg_arn" {
+  type        = string
+}

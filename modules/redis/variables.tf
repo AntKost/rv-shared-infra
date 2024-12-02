@@ -32,3 +32,7 @@ variable "redis_sg_id" {
   description = "The Security Group ID attached to Redis service"
   type        = string
 }
+
+variable "redis_tg_arn" {
+  type        = string
+}

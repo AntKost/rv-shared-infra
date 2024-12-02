@@ -29,7 +29,12 @@ variable "key_pair_name" {
 variable "allowed_ports" {
   description = "Ports to allow ingress from ALB on"
   type = list(number)
-  default     = [22, 1883, 8000, 8001]
+  default     = [1883, 6379, 8000, 8001]
+}
+
+variable "my_ip" {
+  type = string
+  sensitive = true
 }
 
 # Add any other global variables if needed

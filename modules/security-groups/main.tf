@@ -9,7 +9,7 @@ resource "aws_security_group" "ecs_instances_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["176.100.25.70/32"] # Replace with your IP or trusted CIDR blocks
+    cidr_blocks = [var.my_ip]
     description = "Allow SSH access"
   }
 
@@ -60,21 +60,6 @@ resource "aws_security_group" "alb_sg" {
   description = "Allow HTTP and HTTPS traffic"
   vpc_id      = var.vpc_id
 
-  # Ingress rules - allow HTTP and HTTPS
-  ingress {
-    from_port   = 8001
-    to_port     = 8001
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 1883
-    to_port     = 1883
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   # Egress rules - allow all outbound traffic
   egress {
     from_port   = 0
@@ -86,6 +71,33 @@ resource "aws_security_group" "alb_sg" {
   tags = {
     Name = "alb-sg"
   }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "external_view" {
+  security_group_id = aws_security_group.alb_sg.id
+
+  from_port   = 8001
+  to_port     = 8001
+  ip_protocol = "tcp"
+  cidr_ipv4   = "0.0.0.0/0"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "external_agent" {
+  security_group_id = aws_security_group.alb_sg.id
+
+  from_port   = 1883
+  to_port     = 1883
+  ip_protocol = "tcp"
+  cidr_ipv4   = "0.0.0.0/0"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "internal_ecs" {
+  security_group_id = aws_security_group.alb_sg.id
+
+  from_port   = 0
+  to_port     = 0
+  ip_protocol = "-1"
+  referenced_security_group_id = aws_security_group.ecs_instances_sg.id
 }
 
 # Security Group for MQTT Service
@@ -136,7 +148,7 @@ resource "aws_vpc_security_group_ingress_rule" "external_access" {
   from_port   = 5432
   to_port     = 5432
   ip_protocol = "tcp"
-  cidr_ipv4   = "176.100.25.70/32"
+  cidr_ipv4   = var.my_ip
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ecs_access" {

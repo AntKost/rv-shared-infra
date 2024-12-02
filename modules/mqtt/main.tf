@@ -48,7 +48,12 @@ resource "aws_ecs_service" "mqtt" {
   network_configuration {
     subnets         = var.public_subnet_ids
     security_groups = [var.mqtt_sg, var.ecs_instances_sg_id]
-    assign_public_ip = true
+  }
+
+  load_balancer {
+    target_group_arn = var.mqtt_tg_arn
+    container_name = "mqtt"
+    container_port = 1883
   }
 
   service_registries {

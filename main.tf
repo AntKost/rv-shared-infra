@@ -52,6 +52,7 @@ module "mqtt" {
   vpc_id                             = module.vpc.vpc_id
   ecs_instances_sg_id = module.security_groups.ecs_instances_sg_id
   mqtt_sg = module.security_groups.mqtt_sg_id
+  mqtt_tg_arn = module.lb.mqtt_tg_arn
 }
 
 module "redis" {
@@ -63,4 +64,5 @@ module "redis" {
   vpc_id                             = module.vpc.vpc_id
   redis_sg_id = module.security_groups.redis_sg_id
   ecs_instances_sg_id = module.security_groups.ecs_instances_sg_id
+  redis_tg_arn = module.lb.redis_tg_arn
 }

@@ -48,7 +48,12 @@ resource "aws_ecs_service" "redis" {
   network_configuration {
     subnets         = var.public_subnet_ids
     security_groups = [var.redis_sg_id, var.ecs_instances_sg_id]
-    assign_public_ip = true
+  }
+
+  load_balancer {
+    target_group_arn = var.redis_tg_arn
+    container_name = "redis"
+    container_port = 6379
   }
 
   service_registries {

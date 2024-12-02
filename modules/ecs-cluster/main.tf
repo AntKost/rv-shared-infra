@@ -101,6 +101,7 @@ resource "aws_autoscaling_group" "ecs_asg" {
   health_check_grace_period = 300
   health_check_type         = "EC2"
   vpc_zone_identifier       = var.public_subnet_ids
+  protect_from_scale_in = true
   launch_template {
     id      = aws_launch_template.ecs_launch_template.id
     version = "$Latest"

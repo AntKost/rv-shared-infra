@@ -11,3 +11,8 @@ variable "vpc_id" {
 variable "allowed_ports" {
   type = list(number)
 }
+
+variable "my_ip" {
+  type = string
+  sensitive = true
+}
