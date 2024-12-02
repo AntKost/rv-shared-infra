@@ -22,7 +22,7 @@ variable "instance_type" {
 variable "desired_capacity" {
   description = "Desired capacity of the Auto Scaling Group"
   type        = number
-  default     = 2
+  default     = 3
 }
 
 variable "min_size" {
@@ -34,7 +34,7 @@ variable "min_size" {
 variable "max_size" {
   description = "Maximum size of the Auto Scaling Group"
   type        = number
-  default     = 4
+  default     = 6
 }
 
 variable "ecs_ami_id" {
