@@ -94,8 +94,6 @@ resource "aws_vpc_security_group_ingress_rule" "external_agent" {
 resource "aws_vpc_security_group_ingress_rule" "internal_ecs" {
   security_group_id = aws_security_group.alb_sg.id
 
-  from_port   = 0
-  to_port     = 0
   ip_protocol = "-1"
   referenced_security_group_id = aws_security_group.ecs_instances_sg.id
 }
