@@ -56,3 +56,7 @@ variable "redis_tg_green_name" {
 variable "alb_redis_listener_arn" {
   type = string
 }
+
+variable "ecs_asg_id" {
+  type = string
+}

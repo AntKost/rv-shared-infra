@@ -67,6 +67,7 @@ module "mqtt" {
   efs_file_system_id = module.efs.efs_file_system_id
   codedeploy_role_arn = aws_iam_role.codedeploy_role.arn
   alb_mqtt_listener_arn = module.lb.alb_mqtt_listener_arn
+  ecs_asg_id = module.ecs_cluster.ecs_asg_id
 }
 
 module "redis" {
@@ -84,6 +85,7 @@ module "redis" {
   redis_tg_blue_name = module.lb.redis_tg_blue_name
   redis_tg_green_name = module.lb.redis_tg_green_name
   alb_redis_listener_arn = module.lb.alb_redis_listener_arn
+  ecs_asg_id = module.ecs_cluster.ecs_asg_id
 }
 
 resource "aws_iam_role" "codedeploy_role" {
@@ -104,5 +106,5 @@ resource "aws_iam_role" "codedeploy_role" {
 
 resource "aws_iam_role_policy_attachment" "codedeploy_role_policy" {
   role       = aws_iam_role.codedeploy_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSCodeDeployRoleForECS"
+  policy_arn = "arn:aws:iam::aws:policy/AWSCodeDeployRoleForECS"
 }

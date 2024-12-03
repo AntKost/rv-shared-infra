@@ -21,3 +21,7 @@ output "service_discovery_namespace_id" {
 output "service_discovery_namespace_arn" {
   value = aws_service_discovery_private_dns_namespace.service_discovery.arn
 }
+
+output "ecs_asg_id" {
+  value = aws_autoscaling_group.ecs_asg.id
+}

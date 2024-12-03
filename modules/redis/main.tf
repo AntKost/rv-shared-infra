@@ -25,6 +25,7 @@ resource "aws_codedeploy_deployment_group" "redis" {
   app_name              = aws_codedeploy_app.redis.name
   deployment_group_name = "redis-deployment-group"
   service_role_arn      = var.codedeploy_role_arn
+  autoscaling_groups    = [var.ecs_asg_id]
 
   deployment_config_name = "CodeDeployDefault.ECSAllAtOnce"
 
@@ -132,6 +133,6 @@ resource "aws_ecs_service" "redis" {
   }
 
   lifecycle {
-    ignore_changes = [task_definition]
+    ignore_changes = [task_definition, load_balancer]
   }
 }

@@ -60,3 +60,7 @@ variable "codedeploy_role_arn" {
 variable "alb_mqtt_listener_arn" {
   type = string
 }
+
+variable "ecs_asg_id" {
+  type = string
+}
