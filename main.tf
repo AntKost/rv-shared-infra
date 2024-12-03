@@ -35,6 +35,7 @@ module "ecs_cluster" {
   alb_sg_id = module.security_groups.alb_sg_id
   ecs_instances_sg_id = module.security_groups.ecs_instances_sg_id
   allowed_ports              = var.allowed_ports
+  efs_access_policy_arn = module.efs.efs_access_policy_arn
 }
 
 module "lb" {
@@ -42,6 +43,12 @@ module "lb" {
   vpc_id         = module.vpc.vpc_id
   public_subnet_ids = module.vpc.public_subnet_ids
   alb_sg_id = module.security_groups.alb_sg_id
+}
+
+module "efs" {
+  source = "./modules/efs"
+  efs_subnet_ids = module.vpc.public_subnet_ids
+  efs_security_group_ids = module.security_groups.efs_sg_id
 }
 
 module "mqtt" {

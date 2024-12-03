@@ -27,11 +27,25 @@ resource "aws_ecs_task_definition" "mqtt" {
   container_definitions = jsonencode([{
     name  = "mqtt"
     image = "eclipse-mosquitto:latest"
-    portMappings = [{
+    portMappings = [
+    {
       containerPort = 1883
       hostPort      = 1883
       protocol      = "tcp"
-    }]
+    },
+    {
+      containerPort = 9001
+      hostPort      = 9001
+      protocol      = "tcp"
+    }
+    ]
+    healthCheck = {
+      command     = ["CMD", "wget --no-verbose --tries=1 --spider http://localhost/ || exit 1"]
+      interval    = 30
+      timeout     = 5
+      retries     = 3
+      startPeriod = 10
+    }
   }])
 
   execution_role_arn = var.ecs_task_execution_role

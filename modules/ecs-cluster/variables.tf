@@ -68,3 +68,7 @@ variable "allowed_ports" {
   description = "Ports to allow ingress from ALB on"
   type = list(number)
 }
+
+variable "efs_access_policy_arn" {
+  type = string
+}

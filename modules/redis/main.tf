@@ -32,6 +32,13 @@ resource "aws_ecs_task_definition" "redis" {
       hostPort      = 6379
       protocol      = "tcp"
     }]
+    healthCheck = {
+      command     = ["CMD", "redis-cli","ping"]
+      interval    = 30
+      timeout     = 5
+      retries     = 3
+      startPeriod = 10
+    }
   }])
 
   execution_role_arn = var.ecs_task_execution_role

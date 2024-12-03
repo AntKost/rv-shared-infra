@@ -56,6 +56,12 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+# Attach EFS Access Policy to ECS Task Execution Role
+resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_efs_attachment" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = var.efs_access_policy_arn
+}
+
 # Instance Profile
 resource "aws_iam_instance_profile" "ecs_instance_profile" {
   name = "${var.cluster_name}-ecs-instance-profile"

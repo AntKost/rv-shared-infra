@@ -22,6 +22,14 @@ resource "aws_security_group" "ecs_instances_sg" {
   }
 
   ingress {
+    from_port = 2049
+    to_port = 2049
+    protocol = "tcp"
+    security_groups = [aws_security_group.efs_sg.id]
+    description = "Allow EFS access"
+  }
+
+  ingress {
     from_port = 0
     to_port = 0
     protocol = "-1"
@@ -95,6 +103,34 @@ resource "aws_vpc_security_group_ingress_rule" "internal_ecs" {
   security_group_id = aws_security_group.alb_sg.id
 
   ip_protocol = "-1"
+  referenced_security_group_id = aws_security_group.ecs_instances_sg.id
+}
+
+# Security Group for EFS
+resource "aws_security_group" "efs_sg" {
+  name        = "efs-sg"
+  description = "Security group for EFS mount targets"
+  vpc_id      = var.vpc_id
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow all outbound traffic"
+  }
+
+  tags = {
+    Name = "efs-sg"
+  }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "external_agent" {
+  security_group_id = aws_security_group.alb_sg.id
+
+  from_port   = 2049
+  to_port     = 2049
+  ip_protocol = "tcp"
   referenced_security_group_id = aws_security_group.ecs_instances_sg.id
 }
 
