@@ -16,6 +16,66 @@ resource "aws_service_discovery_service" "redis" {
   }
 }
 
+resource "aws_codedeploy_app" "redis" {
+  name        = "redis-codedeploy-app"
+  compute_platform = "ECS"
+}
+
+resource "aws_codedeploy_deployment_group" "redis" {
+  app_name              = aws_codedeploy_app.redis.name
+  deployment_group_name = "redis-deployment-group"
+  service_role_arn      = var.codedeploy_role_arn
+
+  deployment_config_name = "CodeDeployDefault.ECSAllAtOnce"
+
+  ecs_service {
+    cluster_name = var.ecs_cluster_name
+    service_name = aws_ecs_service.redis.name
+  }
+
+  auto_rollback_configuration {
+    enabled = true
+    events  = ["DEPLOYMENT_FAILURE"]
+  }
+
+  blue_green_deployment_config {
+    terminate_blue_instances_on_deployment_success {
+      action                              = "TERMINATE"
+      termination_wait_time_in_minutes    = 5
+    }
+
+    deployment_ready_option {
+      action_on_timeout = "CONTINUE_DEPLOYMENT"
+      wait_time_in_minutes = 0
+    }
+
+    green_fleet_provisioning_option {
+      action = "COPY_AUTO_SCALING_GROUP"
+    }
+  }
+
+  deployment_style {
+    deployment_option = "WITH_TRAFFIC_CONTROL"
+    deployment_type   = "BLUE_GREEN"
+  }
+
+  load_balancer_info {
+    target_group_pair_info {
+      target_group {
+        name = var.redis_tg_blue_name
+      }
+
+      target_group {
+        name = var.redis_tg_green_name
+      }
+
+      prod_traffic_route {
+        listener_arns = [var.alb_redis_listener_arn]
+      }
+    }
+  }
+}
+
 # Redis Task Definition
 resource "aws_ecs_task_definition" "redis" {
   family                   = "redis"
@@ -69,5 +129,9 @@ resource "aws_ecs_service" "redis" {
 
   deployment_controller {
     type = "CODE_DEPLOY"
+  }
+
+  lifecycle {
+    ignore_changes = [task_definition]
   }
 }

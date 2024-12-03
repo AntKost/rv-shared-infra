@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 resource "aws_efs_file_system" "road_vision_efs" {
   creation_token   = var.efs_name
   performance_mode = var.efs_performance_mode

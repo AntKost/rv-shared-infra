@@ -17,12 +17,37 @@ jobs:
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: "1.10.0"
-
+      
       - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-central-1
+
+      - name: Configure AWS Credentials for Terraform
         run: |
           aws --version
           aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} --profile rv-terraform
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} --profile rv-terraform
+
+      - name: Get current task definitions
+        id: get_task_defs
+        run: |
+          MQTT_TASK_DEF_LAST=$(aws ecs list-task-definitions \
+            --family-prefix "mqtt" \
+            --sort DESC \
+            --max-items 1 \
+            --query "taskDefinitionArns[0]" \
+            --output text)
+          echo "::set-output name=MQTT_TASK_DEF_LAST::$MQTT_TASK_DEF_LAST"
+          REDIS_TASK_DEF_LAST=$(aws ecs list-task-definitions \
+            --family-prefix "redis" \
+            --sort DESC \
+            --max-items 1 \
+            --query "taskDefinitionArns[0]" \
+            --output text)
+          echo "::set-output name=REDIS_TASK_DEF_LAST::$REDIS_TASK_DEF_LAST"
 
       - name: Terraform Init
         run: terraform init
@@ -43,3 +68,77 @@ jobs:
           TF_VAR_my_ip: ${{ secrets.TF_VAR_my_ip }}
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve tfplan
+
+      - name: Get Terraform Outputs
+        id: tf_outputs
+        run: |
+          MQTT_TASK_DEF_NEW=$(terraform output -raw mqtt_task_definition_arn)
+          MQTT_CODEDEPLOY_APP_NAME=$(terraform output -raw codedeploy_mqtt_app_name)
+          MQTT_CODEDEPLOY_DEPLOYMENT_GROUP=$(terraform output -raw codedeploy_mqtt_deployment_group_name)
+          REDIS_TASK_DEF_NEW=$(terraform output -raw redis_task_definition_arn)
+          REDIS_CODEDEPLOY_APP_NAME=$(terraform output -raw codedeploy_redis_app_name)
+          REDIS_CODEDEPLOY_DEPLOYMENT_GROUP=$(terraform output -raw codedeploy_redis_deployment_group_name)
+          echo "::set-output name=mqtt_task_def_new::$MQTT_TASK_DEF_NEW"
+          echo "::set-output name=mqtt_codedeploy_app::$MQTT_CODEDEPLOY_APP_NAME"
+          echo "::set-output name=mqtt_codedeploy_deploy_group::$MQTT_CODEDEPLOY_DEPLOYMENT_GROUP"
+          echo "::set-output name=redis_task_def_new::$REDIS_TASK_DEF_NEW"
+          echo "::set-output name=redis_codedeploy_app::$REDIS_CODEDEPLOY_APP_NAME"
+          echo "::set-output name=redis_codedeploy_deploy_group::$REDIS_CODEDEPLOY_DEPLOYMENT_GROUP"
+
+      - name: Generate MQTT AppSpec File and create CodeDeploy Deployment
+        if: ${{ steps.get_task_defs.outputs.MQTT_TASK_DEF_LAST != steps.tf_outputs.outputs.mqtt_task_def_new }}
+        run: |
+          cat <<EOF > mqtt_appspec.json
+          {
+            "version": 1,
+            "Resources": [
+              {
+                "TargetService": {
+                  "Type": "AWS::ECS::Service",
+                  "Properties": {
+                    "TaskDefinition": "${{ steps.tf_outputs.outputs.mqtt_task_def_new }}",
+                    "LoadBalancerInfo": {
+                      "ContainerName": "mqtt",
+                      "ContainerPort": 1883
+                    }
+                  }
+                }
+              }
+            ]
+          }
+          EOF
+          aws deploy create-deployment \
+            --application-name ${{ steps.tf_outputs.outputs.mqtt_codedeploy_app }} \
+            --deployment-group-name ${{ steps.tf_outputs.outputs.mqtt_codedeploy_deploy_group }} \
+            --deployment-config-name CodeDeployDefault.ECSAllAtOnce \
+            --description "Deployment initiated by GitHub Actions" \
+            --revision file://mqtt_appspec.json
+
+      - name: Generate Redis AppSpec File and create CodeDeploy Deployment
+        if: ${{ steps.get_task_defs.outputs.REDIS_TASK_DEF_LAST != steps.tf_outputs.outputs.redis_task_def_new }}
+        run: |
+          cat <<EOF > redis_appspec.json
+          {
+            "version": 1,
+            "Resources": [
+              {
+                "TargetService": {
+                  "Type": "AWS::ECS::Service",
+                  "Properties": {
+                    "TaskDefinition": "${{ steps.tf_outputs.outputs.redis_task_def_new }}",
+                    "LoadBalancerInfo": {
+                      "ContainerName": "redis",
+                      "ContainerPort": 6379
+                    }
+                  }
+                }
+              }
+            ]
+          }
+          EOF
+          aws deploy create-deployment \
+            --application-name ${{ steps.tf_outputs.outputs.redis_codedeploy_app }} \
+            --deployment-group-name ${{ steps.tf_outputs.outputs.redis_codedeploy_deploy_group }} \
+            --deployment-config-name CodeDeployDefault.ECSAllAtOnce \
+            --description "Deployment initiated by GitHub Actions" \
+            --revision file://redis_appspec.json

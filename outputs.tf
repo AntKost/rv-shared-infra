@@ -65,3 +65,27 @@ output "rds_sg_id" {
 output "redis_sg_id" {
   value = module.security_groups.redis_sg_id
 }
+
+output "codedeploy_mqtt_app_name" {
+  value = module.mqtt.codedeploy_app_name
+}
+
+output "codedeploy_mqtt_deployment_group_name" {
+  value = module.mqtt.codedeploy_deployment_group_name
+}
+
+output "mqtt_task_definition_arn" {
+  value = module.mqtt.mqtt_task_definition_arn
+}
+
+output "codedeploy_redis_app_name" {
+  value = module.redis.codedeploy_app_name
+}
+
+output "codedeploy_redis_deployment_group_name" {
+  value = module.redis.codedeploy_deployment_group_name
+}
+
+output "redis_task_definition_arn" {
+  value = module.redis.redis_task_definition_arn
+}

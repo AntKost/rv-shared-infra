@@ -18,7 +18,7 @@ module "rds" {
   subnet_ids   = module.vpc.public_subnet_ids
   db_username  = var.db_username
   db_password  = var.db_password
-  rds_sg_id = module.security_groups.rds_sg_id
+  rds_sg_id    = module.security_groups.rds_sg_id
 }
 
 module "ecs_cluster" {
@@ -48,29 +48,61 @@ module "lb" {
 module "efs" {
   source = "./modules/efs"
   efs_subnet_ids = module.vpc.public_subnet_ids
-  efs_security_group_ids = module.security_groups.efs_sg_id
+  efs_security_group_ids = [module.security_groups.efs_sg_id]
 }
 
 module "mqtt" {
   source                             = "./modules/mqtt"
   ecs_cluster_id                     = module.ecs_cluster.ecs_cluster_id
+  ecs_cluster_name                   = module.ecs_cluster.ecs_cluster_name
   ecs_task_execution_role            = module.ecs_cluster.ecs_task_execution_role_arn
   public_subnet_ids                  = module.vpc.public_subnet_ids
   service_discovery_namespace_id     = module.ecs_cluster.service_discovery_namespace_id
   vpc_id                             = module.vpc.vpc_id
   ecs_instances_sg_id = module.security_groups.ecs_instances_sg_id
   mqtt_sg = module.security_groups.mqtt_sg_id
-  mqtt_tg_arn = module.lb.mqtt_tg_arn
+  mqtt_tg_arn = module.lb.mqtt_tg_blue_arn
+  mqtt_tg_blue_name = module.lb.mqtt_tg_blue_name
+  mqtt_tg_green_name = module.lb.mqtt_tg_green_name
+  efs_file_system_id = module.efs.efs_file_system_id
+  codedeploy_role_arn = aws_iam_role.codedeploy_role.arn
+  alb_mqtt_listener_arn = module.lb.alb_mqtt_listener_arn
 }
 
 module "redis" {
   source                             = "./modules/redis"
   ecs_cluster_id                     = module.ecs_cluster.ecs_cluster_id
+  ecs_cluster_name                   = module.ecs_cluster.ecs_cluster_name
   ecs_task_execution_role            = module.ecs_cluster.ecs_task_execution_role_arn
   public_subnet_ids                  = module.vpc.public_subnet_ids
   service_discovery_namespace_id     = module.ecs_cluster.service_discovery_namespace_id
   vpc_id                             = module.vpc.vpc_id
   redis_sg_id = module.security_groups.redis_sg_id
   ecs_instances_sg_id = module.security_groups.ecs_instances_sg_id
-  redis_tg_arn = module.lb.redis_tg_arn
+  redis_tg_arn = module.lb.redis_tg_blue_arn
+  codedeploy_role_arn = aws_iam_role.codedeploy_role.arn
+  redis_tg_blue_name = module.lb.redis_tg_blue_name
+  redis_tg_green_name = module.lb.redis_tg_green_name
+  alb_redis_listener_arn = module.lb.alb_redis_listener_arn
+}
+
+resource "aws_iam_role" "codedeploy_role" {
+  name = "CodeDeployServiceRole"
+
+  assume_role_policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [{
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "codedeploy.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "codedeploy_role_policy" {
+  role       = aws_iam_role.codedeploy_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSCodeDeployRoleForECS"
 }

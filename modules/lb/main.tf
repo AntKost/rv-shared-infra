@@ -10,8 +10,8 @@ resource "aws_lb" "this" {
   }
 }
 
-resource "aws_lb_target_group" "mqtt_tg" {
-  name        = "mqtt-tg"
+resource "aws_lb_target_group" "mqtt_tg_blue" {
+  name        = "mqtt-tg-blue"
   port        = 1883
   protocol    = "HTTP"
   vpc_id      = var.vpc_id
@@ -31,8 +31,50 @@ resource "aws_lb_target_group" "mqtt_tg" {
   }
 }
 
-resource "aws_lb_target_group" "redis_tg" {
-  name        = "redis-tg"
+resource "aws_lb_target_group" "mqtt_tg_green" {
+  name        = "mqtt-tg-green"
+  port        = 1883
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "ip"
+
+  health_check {
+    path                = "/"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    matcher             = "200-299"
+  }
+
+  tags = {
+    Name = "mqtt-tg"
+  }
+}
+
+resource "aws_lb_target_group" "redis_tg_blue" {
+  name        = "redis-tg-blue"
+  port        = 6379
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "ip"
+
+  health_check {
+    path                = "/"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    matcher             = "200-299"
+  }
+
+  tags = {
+    Name = "redis-tg"
+  }
+}
+
+resource "aws_lb_target_group" "redis_tg_green" {
+  name        = "redis-tg-green"
   port        = 6379
   protocol    = "HTTP"
   vpc_id      = var.vpc_id
@@ -59,7 +101,7 @@ resource "aws_lb_listener" "mqtt" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.mqtt_tg.arn
+    target_group_arn = aws_lb_target_group.mqtt_tg_blue.arn
   }
 
   tags = {
@@ -75,7 +117,7 @@ resource "aws_lb_listener" "redis" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.redis_tg.arn
+    target_group_arn = aws_lb_target_group.redis_tg_blue.arn
   }
 
   tags = {

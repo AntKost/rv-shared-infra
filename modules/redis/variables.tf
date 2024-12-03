@@ -3,6 +3,10 @@ variable "ecs_cluster_id" {
   type        = string
 }
 
+variable "ecs_cluster_name" {
+  type = string
+}
+
 variable "ecs_task_execution_role" {
   description = "The ARN of the ECS task execution role"
   type        = string
@@ -35,4 +39,20 @@ variable "redis_sg_id" {
 
 variable "redis_tg_arn" {
   type        = string
+}
+
+variable "codedeploy_role_arn" {
+  type = string
+}
+
+variable "redis_tg_blue_name" {
+  type = string
+}
+
+variable "redis_tg_green_name" {
+  type = string
+}
+
+variable "alb_redis_listener_arn" {
+  type = string
 }

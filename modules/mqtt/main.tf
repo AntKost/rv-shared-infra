@@ -16,6 +16,67 @@ resource "aws_service_discovery_service" "mqtt" {
   }
 }
 
+resource "aws_codedeploy_app" "mqtt" {
+  name        = "mqtt-codedeploy-app"
+  compute_platform = "ECS"
+}
+
+resource "aws_codedeploy_deployment_group" "mqtt" {
+  app_name              = aws_codedeploy_app.mqtt.name
+  deployment_group_name = "mqtt-deployment-group"
+  service_role_arn      = var.codedeploy_role_arn
+
+  deployment_config_name = "CodeDeployDefault.ECSAllAtOnce"
+
+  ecs_service {
+    cluster_name = var.ecs_cluster_name
+    service_name = aws_ecs_service.mqtt.name
+  }
+
+  auto_rollback_configuration {
+    enabled = true
+    events  = ["DEPLOYMENT_FAILURE"]
+  }
+
+  blue_green_deployment_config {
+    terminate_blue_instances_on_deployment_success {
+      action                              = "TERMINATE"
+      termination_wait_time_in_minutes    = 5
+    }
+
+    deployment_ready_option {
+      action_on_timeout = "CONTINUE_DEPLOYMENT"
+      wait_time_in_minutes = 0
+    }
+
+    green_fleet_provisioning_option {
+      action = "COPY_AUTO_SCALING_GROUP"
+    }
+  }
+
+  deployment_style {
+    deployment_option = "WITH_TRAFFIC_CONTROL"
+    deployment_type   = "BLUE_GREEN"
+  }
+
+  load_balancer_info {
+    target_group_pair_info {
+      target_group {
+        name = var.mqtt_tg_blue_name
+      }
+
+      target_group {
+        name = var.mqtt_tg_green_name
+      }
+
+      prod_traffic_route {
+        listener_arns = [var.alb_mqtt_listener_arn]
+      }
+    }
+  }
+}
+
+
 # MQTT Task Definition
 resource "aws_ecs_task_definition" "mqtt" {
   family                   = "mqtt"
@@ -27,8 +88,7 @@ resource "aws_ecs_task_definition" "mqtt" {
   container_definitions = jsonencode([{
     name  = "mqtt"
     image = "eclipse-mosquitto:latest"
-    portMappings = [
-    {
+    portMappings = [{
       containerPort = 1883
       hostPort      = 1883
       protocol      = "tcp"
@@ -37,7 +97,13 @@ resource "aws_ecs_task_definition" "mqtt" {
       containerPort = 9001
       hostPort      = 9001
       protocol      = "tcp"
-    }
+    }]
+    mountPoints = [
+      {
+        sourceVolume  = "efs_volume"
+        containerPath = "/mqtt"
+        readOnly      = false
+      }
     ]
     healthCheck = {
       command     = ["CMD", "wget --no-verbose --tries=1 --spider http://localhost/ || exit 1"]
@@ -47,6 +113,16 @@ resource "aws_ecs_task_definition" "mqtt" {
       startPeriod = 10
     }
   }])
+
+  volume {
+    name = "efs_volume"
+
+    efs_volume_configuration {
+      file_system_id     = var.efs_file_system_id
+      root_directory     = "/mqtt"
+      transit_encryption = "ENABLED"
+    }
+  }
 
   execution_role_arn = var.ecs_task_execution_role
 }
@@ -76,5 +152,9 @@ resource "aws_ecs_service" "mqtt" {
 
   deployment_controller {
     type = "CODE_DEPLOY"
+  }
+
+  lifecycle {
+    ignore_changes = [task_definition]
   }
 }

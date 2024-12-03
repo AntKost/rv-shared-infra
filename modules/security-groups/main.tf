@@ -125,7 +125,7 @@ resource "aws_security_group" "efs_sg" {
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "external_agent" {
+resource "aws_vpc_security_group_ingress_rule" "efs" {
   security_group_id = aws_security_group.alb_sg.id
 
   from_port   = 2049
