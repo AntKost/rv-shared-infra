@@ -107,4 +107,4 @@ jobs:
             --deployment-group-name ${{ steps.tf_outputs.outputs.mqtt_codedeploy_deploy_group }} \
             --deployment-config-name CodeDeployDefault.ECSAllAtOnce \
             --description "Deployment initiated by GitHub Actions" \
-            --revision file://mqtt_appspec.json
+            --revision mqtt_appspec.json
