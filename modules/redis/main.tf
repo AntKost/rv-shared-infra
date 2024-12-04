@@ -25,7 +25,6 @@ resource "aws_codedeploy_deployment_group" "redis" {
   app_name              = aws_codedeploy_app.redis.name
   deployment_group_name = "redis-deployment-group"
   service_role_arn      = var.codedeploy_role_arn
-  autoscaling_groups    = [var.ecs_asg_id]
 
   deployment_config_name = "CodeDeployDefault.ECSAllAtOnce"
 
@@ -48,10 +47,6 @@ resource "aws_codedeploy_deployment_group" "redis" {
     deployment_ready_option {
       action_on_timeout = "CONTINUE_DEPLOYMENT"
       wait_time_in_minutes = 0
-    }
-
-    green_fleet_provisioning_option {
-      action = "COPY_AUTO_SCALING_GROUP"
     }
   }
 
