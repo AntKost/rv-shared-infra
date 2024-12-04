@@ -64,13 +64,18 @@ jobs:
 
       - name: Get Terraform Outputs
         id: tf_outputs
+        shell: bash
         run: |
           MQTT_TASK_DEF_NEW=$(terraform output -raw mqtt_task_definition_arn)
           MQTT_CODEDEPLOY_APP_NAME=$(terraform output -raw codedeploy_mqtt_app_name)
           MQTT_CODEDEPLOY_DEPLOYMENT_GROUP=$(terraform output -raw codedeploy_mqtt_deployment_group_name)
-          echo "::set-output name=mqtt_task_def_new::$MQTT_TASK_DEF_NEW"
-          echo "::set-output name=mqtt_codedeploy_app::$MQTT_CODEDEPLOY_APP_NAME"
-          echo "::set-output name=mqtt_codedeploy_deploy_group::$MQTT_CODEDEPLOY_DEPLOYMENT_GROUP"
+          echo "mqtt_task_def_new=$MQTT_TASK_DEF_NEW" >> $GITHUB_OUTPUT
+          echo "mqtt_codedeploy_app=$MQTT_CODEDEPLOY_APP_NAME" >> $GITHUB_OUTPUT
+          echo "mqtt_codedeploy_deploy_group=$MQTT_CODEDEPLOY_DEPLOYMENT_GROUP" >> $GITHUB_OUTPUT
+          echo "Terraform outputs retrieved:"
+          echo "mqtt_task_def_new=$MQTT_TASK_DEF_NEW"
+          echo "mqtt_codedeploy_app=$MQTT_CODEDEPLOY_APP_NAME"
+          echo "mqtt_codedeploy_deploy_group=$MQTT_CODEDEPLOY_DEPLOYMENT_GROUP"
 
       - name: Generate MQTT AppSpec File and create CodeDeploy Deployment
         if: ${{ steps.get_task_def.outputs.MQTT_TASK_DEF_LAST != steps.tf_outputs.outputs.mqtt_task_def_new }}

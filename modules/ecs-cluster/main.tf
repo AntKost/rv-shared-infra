@@ -122,6 +122,9 @@ resource "aws_autoscaling_group" "ecs_asg" {
     value               = true
     propagate_at_launch = true
   }
+  lifecycle {
+    ignore_changes = [desired_capacity]
+  }
 }
 
 # ECS Cluster

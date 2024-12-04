@@ -134,6 +134,15 @@ resource "aws_vpc_security_group_ingress_rule" "efs" {
   referenced_security_group_id = aws_security_group.ecs_instances_sg.id
 }
 
+resource "aws_vpc_security_group_ingress_rule" "efs_external" {
+  security_group_id = aws_security_group.efs_sg.id
+
+  from_port   = 2049
+  to_port     = 2049
+  ip_protocol = "tcp"
+  cidr_ipv4   = var.my_ip
+}
+
 # Security Group for MQTT Service
 resource "aws_security_group" "mqtt_sg" {
   name        = "mqtt-sg"
