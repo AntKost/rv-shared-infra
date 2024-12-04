@@ -65,6 +65,10 @@ jobs:
 
       - name: Generate MQTT AppSpec File and create CodeDeploy Deployment
         if: ${{ steps.get_task_def.outputs.mqtt_task_def_last != steps.apply.outputs.mqtt_task_definition_arn }}
+        env:
+          MQTT_TASK_DEFINITION_ARN: ${{ steps.apply.outputs.mqtt_task_definition_arn }}
+          APP_NAME: ${{ steps.apply.outputs.codedeploy_mqtt_app_name }}
+          GROUP_NAME: ${{ steps.apply.outputs.codedeploy_mqtt_deployment_group_name }}
         run: |
           cat <<EOF > mqtt_appspec.json
           {
@@ -74,7 +78,7 @@ jobs:
                 "TargetService": {
                   "Type": "AWS::ECS::Service",
                   "Properties": {
-                    "TaskDefinition": "${{ steps.apply.outputs.mqtt_task_definition_arn }}",
+                    "TaskDefinition": "$MQTT_TASK_DEFINITION_ARN,
                     "LoadBalancerInfo": {
                       "ContainerName": "mqtt",
                       "ContainerPort": 1883
@@ -86,8 +90,8 @@ jobs:
           }
           EOF
           aws deploy create-deployment \
-            --application-name ${{ steps.apply.outputs.codedeploy_mqtt_app_name }} \
-            --deployment-group-name ${{ steps.apply.outputs.codedeploy_mqtt_deployment_group_name }} \
+            --application-name $APP_NAME \
+            --deployment-group-name $GROUP_NAME \
             --deployment-config-name CodeDeployDefault.ECSAllAtOnce \
             --description "Deployment initiated by GitHub Actions" \
             --revision file://mqtt_appspec.json
