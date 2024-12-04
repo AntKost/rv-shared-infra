@@ -17,6 +17,7 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: "1.10.0"
+          terraform_wrapper: false
       
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -63,12 +64,23 @@ jobs:
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve tfplan
 
+      - name: Get Terraform Outputs
+        id: tf_outputs
+        shell: bash
+        run: |
+          MQTT_TASK_DEF_NEW=$(terraform output -raw mqtt_task_definition_arn)
+          MQTT_CODEDEPLOY_APP_NAME=$(terraform output -raw codedeploy_mqtt_app_name)
+          MQTT_CODEDEPLOY_DEPLOYMENT_GROUP=$(terraform output -raw codedeploy_mqtt_deployment_group_name)
+          echo "mqtt_task_def_new=$MQTT_TASK_DEF_NEW" >> $GITHUB_OUTPUT
+          echo "mqtt_codedeploy_app=$MQTT_CODEDEPLOY_APP_NAME" >> $GITHUB_OUTPUT
+          echo "mqtt_codedeploy_deploy_group=$MQTT_CODEDEPLOY_DEPLOYMENT_GROUP" >> $GITHUB_OUTPUT
+          echo "Terraform outputs retrieved:"
+          echo "mqtt_task_def_new=$MQTT_TASK_DEF_NEW"
+          echo "mqtt_codedeploy_app=$MQTT_CODEDEPLOY_APP_NAME"
+          echo "mqtt_codedeploy_deploy_group=$MQTT_CODEDEPLOY_DEPLOYMENT_GROUP"
+
       - name: Generate MQTT AppSpec File and create CodeDeploy Deployment
-        if: ${{ steps.get_task_def.outputs.mqtt_task_def_last != steps.apply.outputs.mqtt_task_definition_arn }}
-        env:
-          MQTT_TASK_DEFINITION_ARN: ${{ steps.apply.outputs.mqtt_task_definition_arn }}
-          APP_NAME: ${{ steps.apply.outputs.codedeploy_mqtt_app_name }}
-          GROUP_NAME: ${{ steps.apply.outputs.codedeploy_mqtt_deployment_group_name }}
+        if: ${{ steps.get_task_def.outputs.MQTT_TASK_DEF_LAST != steps.tf_outputs.outputs.mqtt_task_def_new }}
         run: |
           cat <<EOF > mqtt_appspec.json
           {
@@ -78,7 +90,7 @@ jobs:
                 "TargetService": {
                   "Type": "AWS::ECS::Service",
                   "Properties": {
-                    "TaskDefinition": "$MQTT_TASK_DEFINITION_ARN,
+                    "TaskDefinition": "${{ steps.tf_outputs.outputs.mqtt_task_def_new }}",
                     "LoadBalancerInfo": {
                       "ContainerName": "mqtt",
                       "ContainerPort": 1883
@@ -90,8 +102,8 @@ jobs:
           }
           EOF
           aws deploy create-deployment \
-            --application-name $APP_NAME \
-            --deployment-group-name $GROUP_NAME \
+            --application-name ${{ steps.tf_outputs.outputs.mqtt_codedeploy_app }} \
+            --deployment-group-name ${{ steps.tf_outputs.outputs.mqtt_codedeploy_deploy_group }} \
             --deployment-config-name CodeDeployDefault.ECSAllAtOnce \
             --description "Deployment initiated by GitHub Actions" \
             --revision file://mqtt_appspec.json
