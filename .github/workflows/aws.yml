@@ -64,7 +64,7 @@ jobs:
         run: terraform apply -auto-approve tfplan
 
       - name: Generate MQTT AppSpec File and create CodeDeploy Deployment
-        if: ${{ steps.apply.outputs.MQTT_TASK_DEF_LAST != steps.apply.outputs.mqtt_task_def_new }}
+        if: ${{ steps.get_task_def.outputs.mqtt_task_def_last != steps.apply.outputs.mqtt_task_definition_arn }}
         run: |
           cat <<EOF > mqtt_appspec.json
           {
