@@ -74,7 +74,7 @@ jobs:
                 "TargetService": {
                   "Type": "AWS::ECS::Service",
                   "Properties": {
-                    "TaskDefinition": "${{ steps.apply.outputs.mqtt_task_def_new }}",
+                    "TaskDefinition": "${{ steps.apply.outputs.mqtt_task_definition_arn }}",
                     "LoadBalancerInfo": {
                       "ContainerName": "mqtt",
                       "ContainerPort": 1883
@@ -86,8 +86,8 @@ jobs:
           }
           EOF
           aws deploy create-deployment \
-            --application-name ${{ steps.apply.outputs.mqtt_codedeploy_app }} \
-            --deployment-group-name ${{ steps.apply.outputs.mqtt_codedeploy_deploy_group }} \
+            --application-name ${{ steps.apply.outputs.codedeploy_mqtt_app_name }} \
+            --deployment-group-name ${{ steps.apply.outputs.codedeploy_mqtt_deployment_group_name }} \
             --deployment-config-name CodeDeployDefault.ECSAllAtOnce \
             --description "Deployment initiated by GitHub Actions" \
             --revision file://mqtt_appspec.json
