@@ -102,7 +102,7 @@ resource "aws_ecs_task_definition" "mqtt" {
       }
     ]
     healthCheck = {
-      command     = ["CMD", "wget --no-verbose --tries=1 --spider http://localhost/ || exit 1"]
+      command     = ["CMD", "wget --no-verbose --tries=1 --spider http://localhost:9001/ || exit 1"]
       interval    = 30
       timeout     = 5
       retries     = 3

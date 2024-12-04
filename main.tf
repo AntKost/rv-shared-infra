@@ -70,22 +70,11 @@ module "mqtt" {
   ecs_asg_id = module.ecs_cluster.ecs_asg_id
 }
 
-module "redis" {
-  source                             = "./modules/redis"
-  ecs_cluster_id                     = module.ecs_cluster.ecs_cluster_id
-  ecs_cluster_name                   = module.ecs_cluster.ecs_cluster_name
-  ecs_task_execution_role            = module.ecs_cluster.ecs_task_execution_role_arn
-  public_subnet_ids                  = module.vpc.public_subnet_ids
-  service_discovery_namespace_id     = module.ecs_cluster.service_discovery_namespace_id
-  vpc_id                             = module.vpc.vpc_id
-  redis_sg_id = module.security_groups.redis_sg_id
-  ecs_instances_sg_id = module.security_groups.ecs_instances_sg_id
-  redis_tg_arn = module.lb.redis_tg_blue_arn
-  codedeploy_role_arn = aws_iam_role.codedeploy_role.arn
-  redis_tg_blue_name = module.lb.redis_tg_blue_name
-  redis_tg_green_name = module.lb.redis_tg_green_name
-  alb_redis_listener_arn = module.lb.alb_redis_listener_arn
-  ecs_asg_id = module.ecs_cluster.ecs_asg_id
+module "elasticache" {
+  source                    = "./modules/elasticache"
+  subnet_ids                = module.vpc.private_subnet_ids
+  vpc_id                    = module.vpc.vpc_id
+  security_group_ids        = module.security_groups.redis_sg_id
 }
 
 resource "aws_iam_role" "codedeploy_role" {

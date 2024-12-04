@@ -126,7 +126,7 @@ resource "aws_security_group" "efs_sg" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "efs" {
-  security_group_id = aws_security_group.alb_sg.id
+  security_group_id = aws_security_group.efs_sg.id
 
   from_port   = 2049
   to_port     = 2049
@@ -197,24 +197,23 @@ resource "aws_vpc_security_group_ingress_rule" "ecs_access" {
 # Security Group for Redis Service
 resource "aws_security_group" "redis_sg" {
   name        = "redis-sg"
-  description = "Allow Redis traffic"
+  description = "Security group for Redis cluster"
   vpc_id      = var.vpc_id
 
-  # Ingress rules - allow inbound Redis traffic from ECS instances
   ingress {
     from_port       = 6379
     to_port         = 6379
     protocol        = "tcp"
     security_groups = [aws_security_group.ecs_instances_sg.id]
-    description     = "Allow Redis traffic from ECS instances"
+    description     = "Allow Redis access from microservices"
   }
 
-  # Egress rules - allow all outbound traffic
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow all outbound traffic"
   }
 
   tags = {
