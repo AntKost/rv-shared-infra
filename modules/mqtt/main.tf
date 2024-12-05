@@ -106,7 +106,7 @@ resource "aws_ecs_task_definition" "mqtt" {
       interval    = 30
       timeout     = 5
       retries     = 3
-      startPeriod = 15
+      startPeriod = 10
     }
   }])
 

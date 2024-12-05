@@ -22,13 +22,13 @@ variable "instance_type" {
 variable "desired_capacity" {
   description = "Desired capacity of the Auto Scaling Group"
   type        = number
-  default     = 3
+  default     = 1
 }
 
 variable "min_size" {
   description = "Minimum size of the Auto Scaling Group"
   type        = number
-  default     = 0
+  default     = 1
 }
 
 variable "max_size" {
