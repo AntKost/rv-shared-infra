@@ -36,6 +36,11 @@ resource "aws_iam_role_policy_attachment" "ecs_instance_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
 }
 
+resource "aws_iam_role_policy_attachment" "instance_role_efs_attachment" {
+  role       = aws_iam_role.ecs_instance_role.name
+  policy_arn = var.efs_access_policy_arn
+}
+
 # ECS Task Execution Role
 resource "aws_iam_role" "ecs_task_execution_role" {
   name = "${var.cluster_name}-ecs-task-execution-role"

@@ -79,7 +79,7 @@ resource "aws_ecs_task_definition" "mqtt" {
   network_mode             = "awsvpc"
   requires_compatibilities = ["EC2"]
   cpu                      = "256"
-  memory                   = "256"
+  memory                   = "480"
 
   container_definitions = jsonencode([{
     name  = "mqtt"
@@ -115,7 +115,7 @@ resource "aws_ecs_task_definition" "mqtt" {
   
     efs_volume_configuration {
       file_system_id     = var.efs_file_system_id
-      root_directory     = "/mqtt"
+      //root_directory     = "/mqtt"
       transit_encryption = "ENABLED"
     }
   }
