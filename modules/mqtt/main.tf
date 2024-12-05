@@ -72,6 +72,10 @@ resource "aws_codedeploy_deployment_group" "mqtt" {
   }
 }
 
+resource "aws_cloudwatch_log_group" "mqtt_log_group" {
+  name              = "/ecs/mqtt"
+  retention_in_days = 3
+}
 
 # MQTT Task Definition
 resource "aws_ecs_task_definition" "mqtt" {
@@ -108,6 +112,14 @@ resource "aws_ecs_task_definition" "mqtt" {
       retries     = 3
       startPeriod = 15
     }
+    logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          "awslogs-group"         = aws_cloudwatch_log_group.mqtt_log_group.name
+          "awslogs-region"        = var.aws_region
+          "awslogs-stream-prefix" = "ecs"
+        }
+      }
   }])
 
   volume {

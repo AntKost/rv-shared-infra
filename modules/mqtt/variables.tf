@@ -27,6 +27,10 @@ variable "vpc_id" {
   type        = string
 }
 
+variable "aws_region" {
+  type = string
+}
+
 variable "ecs_instances_sg_id" {
   description = "The Security Group ID attached to ECS instances"
   type        = string
