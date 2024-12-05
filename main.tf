@@ -27,8 +27,8 @@ module "ecs_cluster" {
   vpc_id            = module.vpc.vpc_id
   public_subnet_ids = module.vpc.public_subnet_ids
   instance_type     = "t2.micro"
-  desired_capacity  = 2
-  min_size          = 0
+  desired_capacity  = 1
+  min_size          = 1
   max_size          = 4
   key_pair_name     = var.key_pair_name
   rds_sg_id = module.security_groups.rds_sg_id
