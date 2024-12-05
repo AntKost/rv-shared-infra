@@ -121,6 +121,7 @@ resource "aws_ecs_task_definition" "mqtt" {
   }
 
   execution_role_arn = var.ecs_task_execution_role
+  task_role_arn      = var.ecs_task_execution_role
 }
 
 # MQTT ECS Service
@@ -130,6 +131,7 @@ resource "aws_ecs_service" "mqtt" {
   task_definition = aws_ecs_task_definition.mqtt.arn
   desired_count   = 1
   launch_type     = "EC2"
+  
 
   network_configuration {
     subnets         = var.public_subnet_ids
