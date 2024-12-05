@@ -106,7 +106,7 @@ resource "aws_ecs_task_definition" "mqtt" {
       }
     ]
     healthCheck = {
-      command     = ["CMD", "mosquitto_sub", "-t", "$$SYS/#", "-C", "1", "-i", "healthcheck", "-W", "3", "-v"]
+      command     = ["CMD", "mosquitto_sub -v -t $$SYS/# -C 1 -i healthcheck -W 3 || exit 1"]
       interval    = 30
       timeout     = 10
       retries     = 5
