@@ -35,12 +35,7 @@ jobs:
       - name: Get current task definition
         id: get_task_def
         run: |
-          MQTT_TASK_DEF_LAST=$(aws ecs list-task-definitions \
-            --family-prefix "mqtt" \
-            --sort DESC \
-            --max-items 1 \
-            --query "taskDefinitionArns[0]" \
-            --output text)
+          MQTT_TASK_DEF_LAST=$(aws ecs describe-task-definition --task-definition="mqtt" | jq '.taskDefinition.taskDefinitionArn')
           echo $MQTT_TASK_DEF_LAST
           echo "mqtt_task_def_last=$MQTT_TASK_DEF_LAST" >> $GITHUB_OUTPUT
 
