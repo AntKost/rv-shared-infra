@@ -80,7 +80,7 @@ jobs:
           echo "mqtt_codedeploy_app=$MQTT_CODEDEPLOY_APP_NAME"
           echo "mqtt_codedeploy_deploy_group=$MQTT_CODEDEPLOY_DEPLOYMENT_GROUP"
 
-      - name: Generate MQTT AppSpec File and create CodeDeploy Deployment
+      - name: Generate MQTT AppSpec and Task Definition
         if: ${{ steps.get_task_def.outputs.MQTT_TASK_DEF_LAST != steps.tf_outputs.outputs.mqtt_task_def_new }}
         run: |
           cat <<EOF > mqtt_appspec.json
@@ -91,7 +91,7 @@ jobs:
                 "TargetService": {
                   "Type": "AWS::ECS::Service",
                   "Properties": {
-                    "TaskDefinition": "${{ steps.tf_outputs.outputs.mqtt_task_def_new }}",
+                    "TaskDefinition": "",
                     "LoadBalancerInfo": {
                       "ContainerName": "mqtt",
                       "ContainerPort": 1883
@@ -102,9 +102,17 @@ jobs:
             ]
           }
           EOF
-          aws deploy create-deployment \
-            --application-name ${{ steps.tf_outputs.outputs.mqtt_codedeploy_app }} \
-            --deployment-group-name ${{ steps.tf_outputs.outputs.mqtt_codedeploy_deploy_group }} \
-            --deployment-config-name CodeDeployDefault.ECSAllAtOnce \
-            --description "Deployment initiated by GitHub Actions" \
-            --revision mqtt_appspec.json
+          aws ecs describe-task-definition --task-definition "mqtt" --query taskDefinition > task-definition.json
+
+      - name: ECS task deployment using CodeDeploy
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        env:
+          ACTIONS_STEP_DEBUG: true #enable step debug logging
+        with:
+          task-definition: task-definition.json
+          service: mqtt-service
+          cluster: road-vision-cluster
+          wait-for-service-stability: false
+          codedeploy-appspec: mqtt_appspec.json
+          codedeploy-application: mqtt-codedeploy-app
+          codedeploy-deployment-group: mqtt-deployment-group
