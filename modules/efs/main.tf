@@ -35,6 +35,8 @@ resource "aws_iam_policy" "efs_access_policy" {
         Action = [
           "elasticfilesystem:ClientMount",
           "elasticfilesystem:ClientWrite",
+          "elasticfilesystem:DescribeMountTargets",
+          "elasticfilesystem:DescribeFileSystems",
           "elasticfilesystem:ClientRootAccess"
         ],
         Resource = "arn:aws:elasticfilesystem:${var.aws_region}:${data.aws_caller_identity.current.account_id}:file-system/${aws_efs_file_system.road_vision_efs.id}"
