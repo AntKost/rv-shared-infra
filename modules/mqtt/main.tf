@@ -97,7 +97,7 @@ resource "aws_ecs_task_definition" "mqtt" {
     mountPoints = [
       {
         sourceVolume  = "efs_volume"
-        containerPath = "/mqtt"
+        containerPath = "/mqtt/mosquitto.conf"
         readOnly      = false
       }
     ]
@@ -115,7 +115,7 @@ resource "aws_ecs_task_definition" "mqtt" {
   
     efs_volume_configuration {
       file_system_id     = var.efs_file_system_id
-      //root_directory     = "/mqtt"
+      root_directory     = "/mosquitto.conf"
       transit_encryption = "ENABLED"
     }
   }
