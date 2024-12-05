@@ -94,13 +94,13 @@ resource "aws_ecs_task_definition" "mqtt" {
       hostPort      = 9001
       protocol      = "tcp"
     }]
-    mountPoints = [
-      {
-        sourceVolume  = "efs_volume"
-        containerPath = "/mqtt"
-        readOnly      = false
-      }
-    ]
+    //mountPoints = [
+    //  {
+    //    sourceVolume  = "efs_volume"
+    //    containerPath = "/mqtt"
+    //    readOnly      = false
+    //  }
+    //]
     healthCheck = {
       command     = ["CMD", "wget --no-verbose --tries=1 --spider http://localhost:9001/ || exit 1"]
       interval    = 30
@@ -110,15 +110,15 @@ resource "aws_ecs_task_definition" "mqtt" {
     }
   }])
 
-  volume {
-    name = "efs_volume"
-
-    efs_volume_configuration {
-      file_system_id     = var.efs_file_system_id
-      root_directory     = "/mqtt"
-      transit_encryption = "ENABLED"
-    }
-  }
+  //volume {
+  //  name = "efs_volume"
+  //
+  //  efs_volume_configuration {
+  //    file_system_id     = var.efs_file_system_id
+  //    root_directory     = "/mqtt"
+  //    transit_encryption = "ENABLED"
+  //  }
+  //}
 
   execution_role_arn = var.ecs_task_execution_role
   task_role_arn      = var.ecs_task_execution_role
