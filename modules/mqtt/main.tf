@@ -108,9 +108,9 @@ resource "aws_ecs_task_definition" "mqtt" {
     healthCheck = {
       command     = ["CMD", "mosquitto_sub", "-t", "$$SYS/#", "-C", "1", "-i", "healthcheck", "-W", "3"]
       interval    = 30
-      timeout     = 5
-      retries     = 3
-      startPeriod = 30
+      timeout     = 10
+      retries     = 5
+      startPeriod = 20
     }
     logConfiguration = {
         logDriver = "awslogs"
