@@ -105,7 +105,7 @@ resource "aws_ecs_task_definition" "mqtt" {
     mountPoints = [
       {
         sourceVolume  = "efs_volume"
-        containerPath = "/mosquitto/config"
+        containerPath = "/mosquitto"
         readOnly      = false
       }
     ]

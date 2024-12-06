@@ -23,7 +23,7 @@ resource "aws_lb_target_group" "mqtt_tg_blue" {
     timeout             = 5
     healthy_threshold   = 2
     unhealthy_threshold = 2
-    matcher             = "200-299"
+    matcher             = "200-499"
     port                = 9001
   }
 
@@ -45,7 +45,7 @@ resource "aws_lb_target_group" "mqtt_tg_green" {
     timeout             = 5
     healthy_threshold   = 2
     unhealthy_threshold = 2
-    matcher             = "200-299"
+    matcher             = "200-499"
     port                = 9001
   }
 

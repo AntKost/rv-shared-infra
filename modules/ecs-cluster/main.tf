@@ -106,7 +106,7 @@ resource "aws_autoscaling_group" "ecs_asg" {
   health_check_grace_period = 60
   health_check_type         = "EC2"
   vpc_zone_identifier       = var.public_subnet_ids
-  protect_from_scale_in = true
+  protect_from_scale_in = false
   launch_template {
     id      = aws_launch_template.ecs_launch_template.id
     version = "$Latest"
@@ -140,7 +140,7 @@ resource "aws_ecs_capacity_provider" "asg_capacity_provider" {
 
     managed_scaling {
       status                    = "ENABLED"
-      target_capacity           = 100
+      target_capacity           = 90
       minimum_scaling_step_size = 1
       maximum_scaling_step_size = 2
     }
