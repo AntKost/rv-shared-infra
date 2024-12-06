@@ -63,11 +63,8 @@ module "mqtt" {
   mqtt_sg = module.security_groups.mqtt_sg_id
   mqtt_tg_arn = module.lb.mqtt_tg_blue_arn
   mqtt_tg_blue_name = module.lb.mqtt_tg_blue_name
-  mqtt_tg_green_name = module.lb.mqtt_tg_green_name
   efs_file_system_id = module.efs.efs_file_system_id
-  codedeploy_role_arn = aws_iam_role.codedeploy_role.arn
   alb_mqtt_listener_arn = module.lb.alb_mqtt_listener_arn
-  alb_mqtt_test_listener_arn = module.lb.alb_mqtt_test_listener_arn
   ecs_asg_id = module.ecs_cluster.ecs_asg_id
   aws_region = var.aws_region
 }

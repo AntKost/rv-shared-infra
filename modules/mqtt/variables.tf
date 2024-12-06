@@ -45,10 +45,6 @@ variable "mqtt_tg_arn" {
   type        = string
 }
 
-variable "mqtt_tg_green_name" {
-  type = string
-}
-
 variable "mqtt_tg_blue_name" {
   type = string
 }
@@ -57,15 +53,7 @@ variable "efs_file_system_id" {
   type = string
 }
 
-variable "codedeploy_role_arn" {
-  type = string
-}
-
 variable "alb_mqtt_listener_arn" {
-  type = string
-}
-
-variable "alb_mqtt_test_listener_arn" {
   type = string
 }
 
