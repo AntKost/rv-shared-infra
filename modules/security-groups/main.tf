@@ -99,7 +99,7 @@ resource "aws_vpc_security_group_ingress_rule" "external_agent" {
   cidr_ipv4   = "0.0.0.0/0"
 }
 
-resource "aws_vpc_security_group_ingress_rule" "external_agent" {
+resource "aws_vpc_security_group_ingress_rule" "health_check" {
   security_group_id = aws_security_group.alb_sg.id
 
   from_port   = 9001
