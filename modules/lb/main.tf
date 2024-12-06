@@ -18,7 +18,6 @@ resource "aws_lb_target_group" "mqtt_tg_blue" {
   target_type = "ip"
 
   health_check {
-    enabled             = false
     path                = "/"
     interval            = 30
     timeout             = 5
