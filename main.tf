@@ -32,7 +32,7 @@ module "ecs_cluster" {
   max_size          = 2
   key_pair_name     = var.key_pair_name
   rds_sg_id = module.security_groups.rds_sg_id
-  alb_sg_id = module.security_groups.alb_sg_id
+  lb_sg_id = module.security_groups.lb_sg_id
   ecs_instances_sg_id = module.security_groups.ecs_instances_sg_id
   allowed_ports              = var.allowed_ports
   efs_access_policy_arn = module.efs.efs_access_policy_arn
@@ -42,7 +42,7 @@ module "lb" {
   source         = "./modules/lb"
   vpc_id         = module.vpc.vpc_id
   public_subnet_ids = module.vpc.public_subnet_ids
-  alb_sg_id = module.security_groups.alb_sg_id
+  lb_sg_id = module.security_groups.lb_sg_id
 }
 
 module "efs" {
@@ -66,8 +66,8 @@ module "mqtt" {
   mqtt_tg_green_name = module.lb.mqtt_tg_green_name
   efs_file_system_id = module.efs.efs_file_system_id
   codedeploy_role_arn = aws_iam_role.codedeploy_role.arn
-  alb_mqtt_listener_arn = module.lb.alb_mqtt_listener_arn
-  alb_mqtt_test_listener_arn = module.lb.alb_mqtt_test_listener_arn
+  lb_mqtt_listener_arn = module.lb.lb_mqtt_listener_arn
+  lb_mqtt_test_listener_arn = module.lb.lb_mqtt_test_listener_arn
   ecs_asg_id = module.ecs_cluster.ecs_asg_id
   aws_region = var.aws_region
 }
