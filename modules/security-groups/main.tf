@@ -99,6 +99,15 @@ resource "aws_vpc_security_group_ingress_rule" "external_agent" {
   cidr_ipv4   = "0.0.0.0/0"
 }
 
+resource "aws_vpc_security_group_ingress_rule" "external_agent" {
+  security_group_id = aws_security_group.alb_sg.id
+
+  from_port   = 9001
+  to_port     = 9001
+  ip_protocol = "tcp"
+  referenced_security_group_id = aws_security_group.ecs_instances_sg.id
+}
+
 resource "aws_vpc_security_group_ingress_rule" "internal_ecs" {
   security_group_id = aws_security_group.alb_sg.id
 
@@ -132,15 +141,6 @@ resource "aws_vpc_security_group_ingress_rule" "efs" {
   to_port     = 2049
   ip_protocol = "tcp"
   referenced_security_group_id = aws_security_group.ecs_instances_sg.id
-}
-
-resource "aws_vpc_security_group_ingress_rule" "efs_external" {
-  security_group_id = aws_security_group.efs_sg.id
-
-  from_port   = 2049
-  to_port     = 2049
-  ip_protocol = "tcp"
-  cidr_ipv4   = var.my_ip
 }
 
 # Security Group for MQTT Service
