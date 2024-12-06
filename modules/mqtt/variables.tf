@@ -53,7 +53,15 @@ variable "efs_file_system_id" {
   type = string
 }
 
-variable "alb_mqtt_listener_arn" {
+variable "codedeploy_role_arn" {
+  type = string
+}
+
+variable "lb_mqtt_listener_arn" {
+  type = string
+}
+
+variable "lb_mqtt_test_listener_arn" {
   type = string
 }
 

@@ -1,29 +1,49 @@
 # Application Load Balancer
 resource "aws_lb" "this" {
-  name               = "road-vision-alb"
-  load_balancer_type = "application"
+  name               = "road-vision-lb"
+  load_balancer_type = "network"
   subnets            = var.public_subnet_ids
-  security_groups    = [var.alb_sg_id]
+  security_groups    = [var.lb_sg_id]
 
   tags = {
-    Name = "road-vision-alb"
+    Name = "road-vision-lb"
   }
 }
 
 resource "aws_lb_target_group" "mqtt_tg_blue" {
   name        = "mqtt-tg-blue"
   port        = 1883
-  protocol    = "HTTP"
+  protocol    = "TCP"
   vpc_id      = var.vpc_id
   target_type = "ip"
 
   health_check {
-    path                = "/"
+    protocol            = "TCP"
     interval            = 30
     timeout             = 5
     healthy_threshold   = 2
     unhealthy_threshold = 2
-    matcher             = "200-499"
+    port                = 9001
+  }
+
+  tags = {
+    Name = "mqtt-tg"
+  }
+}
+
+resource "aws_lb_target_group" "mqtt_tg_green" {
+  name        = "mqtt-tg-green"
+  port        = 1883
+  protocol    = "TCP"
+  vpc_id      = var.vpc_id
+  target_type = "ip"
+
+  health_check {
+    protocol            = "TCP"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
     port                = 9001
   }
 
@@ -35,7 +55,7 @@ resource "aws_lb_target_group" "mqtt_tg_blue" {
 resource "aws_lb_listener" "mqtt" {
   load_balancer_arn = aws_lb.this.arn
   port              = 1883
-  protocol          = "HTTP"
+  protocol          = "TCP"
 
   default_action {
     type             = "forward"
@@ -44,5 +64,20 @@ resource "aws_lb_listener" "mqtt" {
 
   tags = {
     Name = "mqtt-listener"
+  }
+}
+
+resource "aws_lb_listener" "mqtt_green" {
+  load_balancer_arn = aws_lb.this.arn
+  port              = 9001
+  protocol          = "TCP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.mqtt_tg_green.arn
+  }
+
+  tags = {
+    Name = "mqtt-listener-green"
   }
 }

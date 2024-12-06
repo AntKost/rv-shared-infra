@@ -49,8 +49,8 @@ variable "key_pair_name" {
   default     = "" # Optional: Provide if you need SSH access
 }
 
-variable "alb_sg_id" {
-  description = "The Security Group ID attached to the ALB"
+variable "lb_sg_id" {
+  description = "The Security Group ID attached to the lb"
   type        = string
 }
 
@@ -65,7 +65,7 @@ variable "rds_sg_id" {
 }
 
 variable "allowed_ports" {
-  description = "Ports to allow ingress from ALB on"
+  description = "Ports to allow ingress from lb on"
   type = list(number)
 }
 
