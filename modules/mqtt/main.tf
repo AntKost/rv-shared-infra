@@ -68,6 +68,10 @@ resource "aws_codedeploy_deployment_group" "mqtt" {
       prod_traffic_route {
         listener_arns = [var.alb_mqtt_listener_arn]
       }
+
+      test_traffic_route {
+        listener_arns = [var.alb_mqtt_test_listener_arn]
+      }
     }
   }
 }

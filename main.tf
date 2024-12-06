@@ -67,6 +67,7 @@ module "mqtt" {
   efs_file_system_id = module.efs.efs_file_system_id
   codedeploy_role_arn = aws_iam_role.codedeploy_role.arn
   alb_mqtt_listener_arn = module.lb.alb_mqtt_listener_arn
+  alb_mqtt_test_listener_arn = module.lb.alb_mqtt_test_listener_arn
   ecs_asg_id = module.ecs_cluster.ecs_asg_id
   aws_region = var.aws_region
 }

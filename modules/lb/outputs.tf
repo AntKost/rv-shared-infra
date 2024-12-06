@@ -22,3 +22,7 @@ output "mqtt_tg_green_name" {
 output "alb_mqtt_listener_arn" {
   value = aws_lb_listener.mqtt.arn
 }
+
+output "alb_mqtt_test_listener_arn" {
+  value = aws_lb_listener.mqtt_green.arn
+}

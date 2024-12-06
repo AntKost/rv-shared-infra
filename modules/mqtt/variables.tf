@@ -65,6 +65,10 @@ variable "alb_mqtt_listener_arn" {
   type = string
 }
 
+variable "alb_mqtt_test_listener_arn" {
+  type = string
+}
+
 variable "ecs_asg_id" {
   type = string
 }
