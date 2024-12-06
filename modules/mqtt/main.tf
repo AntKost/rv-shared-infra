@@ -82,8 +82,8 @@ resource "aws_ecs_task_definition" "mqtt" {
   family                   = "mqtt"
   network_mode             = "awsvpc"
   requires_compatibilities = ["EC2"]
-  cpu                      = "256"
-  memory                   = "480"
+  cpu                      = "512"
+  memory                   = "768"
 
   container_definitions = jsonencode([{
     name  = "mqtt"

@@ -68,3 +68,18 @@ resource "aws_lb_listener" "mqtt" {
     Name = "mqtt-listener"
   }
 }
+
+resource "aws_lb_listener" "mqtt_green" {
+  load_balancer_arn = aws_lb.this.arn
+  port              = 9001
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.mqtt_tg_green.arn
+  }
+
+  tags = {
+    Name = "mqtt-listener-green"
+  }
+}

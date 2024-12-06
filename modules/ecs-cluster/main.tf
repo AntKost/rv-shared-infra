@@ -109,7 +109,7 @@ resource "aws_autoscaling_group" "ecs_asg" {
   max_size                  = var.max_size
   min_size                  = var.min_size
   desired_capacity          = var.desired_capacity
-  health_check_grace_period = 300
+  health_check_grace_period = 60
   health_check_type         = "EC2"
   vpc_zone_identifier       = var.public_subnet_ids
   protect_from_scale_in = true
@@ -148,10 +148,10 @@ resource "aws_ecs_capacity_provider" "asg_capacity_provider" {
       status                    = "ENABLED"
       target_capacity           = 100
       minimum_scaling_step_size = 1
-      maximum_scaling_step_size = 4
+      maximum_scaling_step_size = 2
     }
 
-    managed_termination_protection = "ENABLED"
+    managed_termination_protection = "DISABLED"
   }
 }
 
@@ -163,7 +163,7 @@ resource "aws_ecs_cluster_capacity_providers" "this" {
   default_capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.asg_capacity_provider.name
     weight            = 1
-    base              = 0
+    base              = 100
   }
 }
 
