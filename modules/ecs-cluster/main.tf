@@ -79,6 +79,7 @@ resource "aws_launch_template" "ecs_launch_template" {
   image_id      = local.ami_id
   instance_type = var.instance_type
   key_name      = var.key_pair_name
+  monitoring { enabled = true }
 
   iam_instance_profile {
     name = aws_iam_instance_profile.ecs_instance_profile.name
@@ -94,13 +95,6 @@ resource "aws_launch_template" "ecs_launch_template" {
 echo ECS_CLUSTER=${var.cluster_name} >> /etc/ecs/ecs.config
 EOF
   )
-
-  tag_specifications {
-    resource_type = "instance"
-    tags = {
-      Name = "${var.cluster_name}-instance"
-    }
-  }
 }
 
 # Auto Scaling Group
