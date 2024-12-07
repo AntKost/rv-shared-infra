@@ -9,14 +9,17 @@ output "lb_arn" {
 output "mqtt_tg_blue_arn" {
   value = aws_lb_target_group.mqtt_tg_blue.arn
 }
+
 output "mqtt_tg_blue_name" {
   value = aws_lb_target_group.mqtt_tg_blue.name
 }
+
 output "mqtt_tg_green_arn" {
-  value = aws_lb_target_group.mqtt_tg_green.arn
+  value = aws_lb_target_group.mqtt_tg_blue.arn
 }
+
 output "mqtt_tg_green_name" {
-  value = aws_lb_target_group.mqtt_tg_green.name
+  value = aws_lb_target_group.mqtt_tg_blue.name
 }
 
 output "lb_mqtt_listener_arn" {

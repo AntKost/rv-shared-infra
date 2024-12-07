@@ -48,7 +48,7 @@ resource "aws_lb_target_group" "mqtt_tg_green" {
   }
 
   tags = {
-    Name = "mqtt-tg"
+    Name = "mqtt-tg-green"
   }
 }
 
