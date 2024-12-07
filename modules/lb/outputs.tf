@@ -1,8 +1,8 @@
-output "alb_dns_name" {
+output "lb_dns_name" {
   value = aws_lb.this.dns_name
 }
 
-output "alb_arn" {
+output "lb_arn" {
   value = aws_lb.this.arn
 }
 
@@ -19,10 +19,10 @@ output "mqtt_tg_green_name" {
   value = aws_lb_target_group.mqtt_tg_green.name
 }
 
-output "alb_mqtt_listener_arn" {
+output "lb_mqtt_listener_arn" {
   value = aws_lb_listener.mqtt.arn
 }
 
-output "alb_mqtt_test_listener_arn" {
+output "lb_mqtt_test_listener_arn" {
   value = aws_lb_listener.mqtt_green.arn
 }

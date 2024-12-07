@@ -43,8 +43,8 @@ resource "aws_security_group" "ecs_instances_sg" {
       from_port                = ingress.value
       to_port                  = ingress.value
       protocol                 = "tcp"
-      security_groups          = [aws_security_group.alb_sg.id]
-      description              = "Allow traffic from ALB on port ${ingress.value}"
+      security_groups          = [aws_security_group.lb_sg.id]
+      description              = "Allow traffic from lb on port ${ingress.value}"
       self                     = false
     }
   }
@@ -62,9 +62,9 @@ resource "aws_security_group" "ecs_instances_sg" {
   }
 }
 
-# Security Group for ALB
-resource "aws_security_group" "alb_sg" {
-  name        = "alb-sg"
+# Security Group for lb
+resource "aws_security_group" "lb_sg" {
+  name        = "lb-sg"
   description = "Allow HTTP and HTTPS traffic"
   vpc_id      = var.vpc_id
 
@@ -77,12 +77,12 @@ resource "aws_security_group" "alb_sg" {
   }
 
   tags = {
-    Name = "alb-sg"
+    Name = "lb-sg"
   }
 }
 
 resource "aws_vpc_security_group_ingress_rule" "external_view" {
-  security_group_id = aws_security_group.alb_sg.id
+  security_group_id = aws_security_group.lb_sg.id
 
   from_port   = 8001
   to_port     = 8001
@@ -91,7 +91,7 @@ resource "aws_vpc_security_group_ingress_rule" "external_view" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "external_agent" {
-  security_group_id = aws_security_group.alb_sg.id
+  security_group_id = aws_security_group.lb_sg.id
 
   from_port   = 1883
   to_port     = 1883
@@ -100,7 +100,7 @@ resource "aws_vpc_security_group_ingress_rule" "external_agent" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "health_check" {
-  security_group_id = aws_security_group.alb_sg.id
+  security_group_id = aws_security_group.lb_sg.id
 
   from_port   = 9001
   to_port     = 9001
@@ -109,7 +109,7 @@ resource "aws_vpc_security_group_ingress_rule" "health_check" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "internal_ecs" {
-  security_group_id = aws_security_group.alb_sg.id
+  security_group_id = aws_security_group.lb_sg.id
 
   ip_protocol = "-1"
   referenced_security_group_id = aws_security_group.ecs_instances_sg.id

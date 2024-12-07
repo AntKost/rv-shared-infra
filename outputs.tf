@@ -22,12 +22,12 @@ output "ecs_cluster_name" {
   value = module.ecs_cluster.ecs_cluster_name
 }
 
-output "alb_dns_name" {
-  value = module.lb.alb_dns_name
+output "lb_dns_name" {
+  value = module.lb.lb_dns_name
 }
 
-output "alb_arn" {
-  value = module.lb.alb_arn
+output "lb_arn" {
+  value = module.lb.lb_arn
 }
 
 output "service_discovery_namespace_id" {
@@ -46,8 +46,8 @@ output "ecs_instances_sg_id" {
   value = module.security_groups.ecs_instances_sg_id
 }
 
-output "alb_sg_id" {
-  value = module.security_groups.alb_sg_id
+output "lb_sg_id" {
+  value = module.security_groups.lb_sg_id
 }
 
 output "mqtt_sg_id" {

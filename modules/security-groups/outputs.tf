@@ -2,8 +2,8 @@ output "ecs_instances_sg_id" {
   value = aws_security_group.ecs_instances_sg.id
 }
 
-output "alb_sg_id" {
-  value = aws_security_group.alb_sg.id
+output "lb_sg_id" {
+  value = aws_security_group.lb_sg.id
 }
 
 output "mqtt_sg_id" {
