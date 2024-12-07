@@ -49,6 +49,10 @@ variable "mqtt_tg_blue_name" {
   type = string
 }
 
+variable "mqtt_tg_green_name" {
+  type = string
+}
+
 variable "efs_file_system_id" {
   type = string
 }
