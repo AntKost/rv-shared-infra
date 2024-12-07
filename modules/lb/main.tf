@@ -23,7 +23,7 @@ resource "aws_lb_target_group" "mqtt_tg_blue" {
     timeout             = 5
     healthy_threshold   = 2
     unhealthy_threshold = 2
-    port                = 9001
+    port                = 1883
   }
 
   tags = {
@@ -44,7 +44,7 @@ resource "aws_lb_target_group" "mqtt_tg_green" {
     timeout             = 5
     healthy_threshold   = 2
     unhealthy_threshold = 2
-    port                = 9001
+    port                = 1883
   }
 
   tags = {
