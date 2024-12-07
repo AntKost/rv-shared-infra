@@ -65,3 +65,11 @@ output "redis_sg_id" {
 output "mqtt_task_definition_arn" {
   value = module.mqtt.mqtt_task_definition_arn
 }
+
+output "codedeploy_app_name" {
+  value = module.mqtt.codedeploy_app_name
+}
+
+output "codedeploy_deployment_group_name" {
+  value = module.mqtt.codedeploy_deployment_group_name
+}
