@@ -15,11 +15,11 @@ output "mqtt_tg_blue_name" {
 }
 
 output "mqtt_tg_green_arn" {
-  value = aws_lb_target_group.mqtt_tg_blue.arn
+  value = aws_lb_target_group.mqtt_tg_green.arn
 }
 
 output "mqtt_tg_green_name" {
-  value = aws_lb_target_group.mqtt_tg_blue.name
+  value = aws_lb_target_group.mqtt_tg_green.name
 }
 
 output "lb_mqtt_listener_arn" {

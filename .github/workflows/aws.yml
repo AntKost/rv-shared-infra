@@ -32,6 +32,13 @@ jobs:
           aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} --profile rv-terraform
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} --profile rv-terraform
 
+      - name: Get current task definition
+        id: get_task_def
+        run: |
+          MQTT_TASK_DEF_LAST=$(aws ecs describe-task-definition --task-definition="mqtt" | jq '.taskDefinition.taskDefinitionArn')
+          echo $MQTT_TASK_DEF_LAST
+          echo "mqtt_task_def_last=$MQTT_TASK_DEF_LAST" >> $GITHUB_OUTPUT
+  
       - name: Terraform Init
         run: terraform init
 
@@ -52,3 +59,55 @@ jobs:
           TF_VAR_my_ip: ${{ secrets.TF_VAR_my_ip }}
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve tfplan
+
+      - name: Get Terraform Outputs
+        id: tf_outputs
+        shell: bash
+        run: |
+          MQTT_TASK_DEF_NEW=$(terraform output -raw mqtt_task_definition_arn)
+          MQTT_CODEDEPLOY_APP_NAME=$(terraform output -raw codedeploy_mqtt_app_name)
+          MQTT_CODEDEPLOY_DEPLOYMENT_GROUP=$(terraform output -raw codedeploy_mqtt_deployment_group_name)
+          echo "mqtt_task_def_new=$MQTT_TASK_DEF_NEW" >> $GITHUB_OUTPUT
+          echo "mqtt_codedeploy_app=$MQTT_CODEDEPLOY_APP_NAME" >> $GITHUB_OUTPUT
+          echo "mqtt_codedeploy_deploy_group=$MQTT_CODEDEPLOY_DEPLOYMENT_GROUP" >> $GITHUB_OUTPUT
+          echo "Terraform outputs retrieved:"
+          echo "mqtt_task_def_new=$MQTT_TASK_DEF_NEW"
+          echo "mqtt_codedeploy_app=$MQTT_CODEDEPLOY_APP_NAME"
+          echo "mqtt_codedeploy_deploy_group=$MQTT_CODEDEPLOY_DEPLOYMENT_GROUP"
+
+      - name: Generate MQTT AppSpec and Task Definition
+        if: ${{ steps.get_task_def.outputs.MQTT_TASK_DEF_LAST != steps.tf_outputs.outputs.mqtt_task_def_new }}
+        run: |
+          cat <<EOF > mqtt_appspec.json
+          {
+            "version": 1,
+            "Resources": [
+              {
+                "TargetService": {
+                  "Type": "AWS::ECS::Service",
+                  "Properties": {
+                    "TaskDefinition": "",
+                    "LoadBalancerInfo": {
+                      "ContainerName": "mqtt",
+                      "ContainerPort": 1883
+                    }
+                  }
+                }
+              }
+            ]
+          }
+          EOF
+          aws ecs describe-task-definition --task-definition "mqtt" --query taskDefinition > task-definition.json
+
+      - name: ECS task deployment using CodeDeploy
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        env:
+          ACTIONS_STEP_DEBUG: true #enable step debug logging
+        with:
+          task-definition: task-definition.json
+          service: mqtt-service
+          cluster: road-vision-cluster
+          wait-for-service-stability: false
+          codedeploy-appspec: mqtt_appspec.json
+          codedeploy-application: mqtt-codedeploy-app
+          codedeploy-deployment-group: mqtt-deployment-group

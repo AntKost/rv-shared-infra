@@ -147,9 +147,6 @@ resource "aws_ecs_service" "mqtt" {
   task_definition = aws_ecs_task_definition.mqtt.arn
   desired_count   = 1
   launch_type     = "EC2"
-
-  deployment_minimum_healthy_percent = 50
-  deployment_maximum_percent         = 200
   
   network_configuration {
     subnets         = var.public_subnet_ids
@@ -164,5 +161,13 @@ resource "aws_ecs_service" "mqtt" {
 
   service_registries {
     registry_arn = aws_service_discovery_service.mqtt.arn
+  }
+  
+  deployment_controller {
+    type = "CODE_DEPLOY"
+  }
+
+  lifecycle {
+    ignore_changes = [task_definition, load_balancer]
   }
 }
