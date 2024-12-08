@@ -10,6 +10,10 @@ output "ecs_task_execution_role_arn" {
   value = aws_iam_role.ecs_task_execution_role.arn
 }
 
+output "ecs_task_execution_role_name" {
+  value = aws_iam_role.ecs_task_execution_role.name
+}
+
 output "ecs_capacity_provider_name" {
   value = aws_ecs_capacity_provider.asg_capacity_provider.name
 }
@@ -24,4 +28,8 @@ output "service_discovery_namespace_arn" {
 
 output "ecs_asg_id" {
   value = aws_autoscaling_group.ecs_asg.id
+}
+
+output "asg_capacity_provider" {
+  value = aws_ecs_capacity_provider.asg_capacity_provider.name
 }

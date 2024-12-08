@@ -38,6 +38,10 @@ output "ecs_task_execution_role_arn" {
   value = module.ecs_cluster.ecs_task_execution_role_arn
 }
 
+output "ecs_task_execution_role_name" {
+  value = module.ecs_cluster.ecs_task_execution_role_name
+}
+
 output "mqtt_service_discovery_name" {
   value = module.mqtt.mqtt_service_discovery_name
 }
@@ -72,4 +76,12 @@ output "codedeploy_mqtt_app_name" {
 
 output "codedeploy_mqtt_deployment_group_name" {
   value = module.mqtt.codedeploy_deployment_group_name
+}
+
+output "asg_capacity_provider" {
+  value = module.ecs_cluster.asg_capacity_provider
+}
+
+output "codedeploy_role_arn" {
+  value = aws_iam_role.codedeploy_role.arn
 }

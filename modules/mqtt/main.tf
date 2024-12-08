@@ -146,7 +146,12 @@ resource "aws_ecs_service" "mqtt" {
   cluster         = var.ecs_cluster_id
   task_definition = aws_ecs_task_definition.mqtt.arn
   desired_count   = 1
-  launch_type     = "EC2"
+  
+  capacity_provider_strategy {
+    capacity_provider = var.asg_capacity_provider
+    weight            = 1
+    base              = 100
+  }
   
   network_configuration {
     subnets         = var.public_subnet_ids

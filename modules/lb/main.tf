@@ -65,6 +65,10 @@ resource "aws_lb_listener" "mqtt" {
   tags = {
     Name = "mqtt-listener"
   }
+
+  lifecycle {
+    ignore_changes = [ default_action[0].target_group_arn ]
+  }
 }
 
 resource "aws_lb_listener" "mqtt_green" {
@@ -79,5 +83,9 @@ resource "aws_lb_listener" "mqtt_green" {
 
   tags = {
     Name = "mqtt-listener-green"
+  }
+
+  lifecycle {
+    ignore_changes = [ default_action[0].target_group_arn ]
   }
 }

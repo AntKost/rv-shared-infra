@@ -29,7 +29,7 @@ module "ecs_cluster" {
   instance_type     = "t2.micro"
   desired_capacity  = 1
   min_size          = 1
-  max_size          = 2
+  max_size          = 4
   key_pair_name     = var.key_pair_name
   rds_sg_id = module.security_groups.rds_sg_id
   lb_sg_id = module.security_groups.lb_sg_id
@@ -70,6 +70,7 @@ module "mqtt" {
   lb_mqtt_test_listener_arn = module.lb.lb_mqtt_test_listener_arn
   ecs_asg_id = module.ecs_cluster.ecs_asg_id
   aws_region = var.aws_region
+  asg_capacity_provider = module.ecs_cluster.asg_capacity_provider
 }
 
 module "elasticache" {

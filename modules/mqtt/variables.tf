@@ -72,3 +72,7 @@ variable "lb_mqtt_test_listener_arn" {
 variable "ecs_asg_id" {
   type = string
 }
+
+variable "asg_capacity_provider" {
+  type = string
+}

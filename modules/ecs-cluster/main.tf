@@ -145,7 +145,7 @@ resource "aws_ecs_capacity_provider" "asg_capacity_provider" {
       maximum_scaling_step_size = 2
     }
 
-    managed_termination_protection = "DISABLED"
+    managed_termination_protection = "ENABLED"
   }
 }
 
