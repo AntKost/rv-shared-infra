@@ -140,7 +140,7 @@ resource "aws_ecs_capacity_provider" "asg_capacity_provider" {
 
     managed_scaling {
       status                    = "ENABLED"
-      target_capacity           = 90
+      target_capacity           = 100
       minimum_scaling_step_size = 1
       maximum_scaling_step_size = 2
     }

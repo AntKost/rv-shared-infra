@@ -66,6 +66,10 @@ output "redis_sg_id" {
   value = module.security_groups.redis_sg_id
 }
 
+output "redis_endpoint" {
+  value = module.elasticache.redis_endpoint
+}
+
 output "mqtt_task_definition_arn" {
   value = module.mqtt.mqtt_task_definition_arn
 }
