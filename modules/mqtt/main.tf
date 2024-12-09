@@ -158,11 +158,11 @@ resource "aws_ecs_service" "mqtt" {
     security_groups = [var.mqtt_sg, var.ecs_instances_sg_id]
   }
 
-  load_balancer {
-    target_group_arn = var.mqtt_tg_arn
-    container_name = "mqtt"
-    container_port = 1883
-  }
+  //load_balancer {
+  //  target_group_arn = var.mqtt_tg_arn
+  //  container_name = "mqtt"
+  //  container_port = 1883
+  //}
 
   service_registries {
     registry_arn = aws_service_discovery_service.mqtt.arn
@@ -173,6 +173,6 @@ resource "aws_ecs_service" "mqtt" {
   }
 
   lifecycle {
-    ignore_changes = [task_definition, load_balancer]
+    ignore_changes = [task_definition, load_balancer, capacity_provider_strategy]
   }
 }

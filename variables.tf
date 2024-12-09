@@ -29,7 +29,7 @@ variable "key_pair_name" {
 variable "allowed_ports" {
   description = "Ports to allow ingress from lb on"
   type = list(number)
-  default     = [1883, 6379, 8000, 8001, 9001]
+  default     = [1883, 1993, 1994, 6379, 8000, 8080, 8001, 9001, 9090]
 }
 
 variable "my_ip" {
